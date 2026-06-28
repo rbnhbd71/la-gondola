@@ -34,7 +34,7 @@ export default async function CustomersPage() {
   if (!restaurant) {
     return (
       <div className="p-10">
-        <Link href="/dashboard" className="text-sm text-stone-400 hover:text-ink">
+        <Link href="/dashboard" className="text-sm text-ink-faint hover:text-ink">
           {dict.common.backToDashboard}
         </Link>
         <p className="text-red-600 text-sm mt-6">{dict.common.noRestaurantFound}</p>
@@ -51,7 +51,7 @@ export default async function CustomersPage() {
   return (
     <div className="p-10 max-w-5xl">
       <div className="mb-8">
-        <Link href="/dashboard" className="text-sm text-stone-400 hover:text-ink">
+        <Link href="/dashboard" className="text-sm text-ink-faint hover:text-ink">
           {dict.common.backToDashboard}
         </Link>
         <h1 className="font-display font-medium text-3xl text-ink mt-2">{dict.customers.heading}</h1>
@@ -62,7 +62,7 @@ export default async function CustomersPage() {
       )}
 
       {!error && customers?.length === 0 && (
-        <p className="text-stone-500 text-sm">{dict.customers.noCustomersFound}</p>
+        <p className="text-ink-soft text-sm">{dict.customers.noCustomersFound}</p>
       )}
 
       {!error && customers && customers.length > 0 && (
@@ -70,19 +70,19 @@ export default async function CustomersPage() {
           <table className="w-full text-sm border-collapse">
             <thead>
               <tr className="border-b border-line text-left">
-                <th className="pb-3 pr-8 text-xs font-normal uppercase tracking-wide text-stone-400">{dict.customers.colNome}</th>
-                <th className="pb-3 pr-8 text-xs font-normal uppercase tracking-wide text-stone-400">{dict.customers.colTelefono}</th>
-                <th className="pb-3 pr-8 text-xs font-normal uppercase tracking-wide text-stone-400">{dict.customers.colVisite}</th>
-                <th className="pb-3 pr-8 text-xs font-normal uppercase tracking-wide text-stone-400">{dict.customers.colUltimaVisita}</th>
-                <th className="pb-3 pr-8 text-xs font-normal uppercase tracking-wide text-stone-400">{dict.customers.colCompleanno}</th>
-                <th className="pb-3 text-xs font-normal uppercase tracking-wide text-stone-400">{dict.customers.colNote}</th>
+                <th className="pb-3 pr-8 text-xs font-normal uppercase tracking-wide text-ink-faint">{dict.customers.colNome}</th>
+                <th className="pb-3 pr-8 text-xs font-normal uppercase tracking-wide text-ink-faint">{dict.customers.colTelefono}</th>
+                <th className="pb-3 pr-8 text-xs font-normal uppercase tracking-wide text-ink-faint">{dict.customers.colVisite}</th>
+                <th className="pb-3 pr-8 text-xs font-normal uppercase tracking-wide text-ink-faint">{dict.customers.colUltimaVisita}</th>
+                <th className="pb-3 pr-8 text-xs font-normal uppercase tracking-wide text-ink-faint">{dict.customers.colCompleanno}</th>
+                <th className="pb-3 text-xs font-normal uppercase tracking-wide text-ink-faint">{dict.customers.colNote}</th>
               </tr>
             </thead>
             <tbody>
               {customers.map((c) => (
                 <tr key={c.id} className="border-b border-line">
                   <td className="py-3 pr-8 text-ink">{c.nome}</td>
-                  <td className="py-3 pr-8 text-stone-500">{formatPhone(c.telefono)}</td>
+                  <td className="py-3 pr-8 text-ink-soft">{formatPhone(c.telefono)}</td>
                   <td className="py-3 pr-8 text-ink">{c.visite}</td>
                   <td className="py-3 pr-8 text-ink">{c.ultima_visita ? formatDate(c.ultima_visita) : '—'}</td>
                   <td className="py-3 pr-8">
@@ -93,7 +93,7 @@ export default async function CustomersPage() {
                       tSaving={dict.birthday.saving}
                     />
                   </td>
-                  <td className="py-3 text-stone-500">{c.note ?? '—'}</td>
+                  <td className="py-3 text-ink-soft">{c.note ?? '—'}</td>
                 </tr>
               ))}
             </tbody>

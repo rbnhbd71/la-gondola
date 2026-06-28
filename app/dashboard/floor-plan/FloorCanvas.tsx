@@ -19,7 +19,7 @@ function DraggableTable({
   return (
     <div
       ref={setNodeRef}
-      className="absolute flex flex-col items-center justify-center bg-paper border border-line rounded-lg shadow-sm select-none"
+      className="absolute flex flex-col items-center justify-center bg-surface border border-line rounded-lg shadow-sm select-none"
       style={{
         left: table.x, top: table.y, width: 80, height: 80,
         transform: transform ? `translate(${transform.x}px, ${transform.y}px)` : undefined,
@@ -33,14 +33,14 @@ function DraggableTable({
         <button
           onClick={() => onDelete(table.id)}
           onPointerDown={(e) => e.stopPropagation()}
-          className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-wine text-white text-xs flex items-center justify-center hover:bg-wine/90 leading-none"
+          className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-clay text-white text-xs flex items-center justify-center hover:bg-clay-dark leading-none"
           aria-label={`Delete ${table.label}`}
         >
           ×
         </button>
       )}
       <span className="font-display font-medium text-sm text-ink leading-tight">{table.label}</span>
-      <span className="text-xs text-stone-400 mt-0.5">{table.capacity}</span>
+      <span className="text-xs text-ink-faint mt-0.5">{table.capacity}</span>
     </div>
   )
 }
@@ -66,15 +66,15 @@ export default function FloorCanvas({
 
   if (tables.length === 0) {
     return (
-      <div className="flex items-center justify-center bg-[#F0EBE1] rounded-xl" style={{ height: 520 }}>
-        <p className="text-sm text-stone-400">{noTablesFound}</p>
+      <div className="flex items-center justify-center bg-surface-sunk rounded-xl" style={{ height: 520 }}>
+        <p className="text-sm text-ink-faint">{noTablesFound}</p>
       </div>
     )
   }
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-      <div className="relative bg-[#F0EBE1] rounded-xl overflow-hidden" style={{ height: 520 }}>
+      <div className="relative bg-surface-sunk rounded-xl overflow-hidden" style={{ height: 520 }}>
         {tables.map((t) => (
           <DraggableTable key={t.id} table={t} editMode={editMode} onDelete={onDelete} />
         ))}

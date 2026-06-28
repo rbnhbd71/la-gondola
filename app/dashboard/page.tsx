@@ -61,9 +61,9 @@ export default async function DashboardPage() {
       <h1 className="font-display font-medium text-3xl text-ink mb-8">{dict.dashboard.heading}</h1>
       <div className="grid grid-cols-3 gap-3">
         {stats.map(({ label, value }) => (
-          <div key={label} className="bg-[#F0EBE1] rounded-xl p-5">
-            <p className="font-display font-medium text-4xl text-wine">{value ?? '—'}</p>
-            <p className="text-sm text-stone-500 mt-1">{label}</p>
+          <div key={label} className="bg-surface-sunk rounded-xl p-5">
+            <p className="font-display font-medium text-4xl text-clay">{value ?? '—'}</p>
+            <p className="text-sm text-ink-soft mt-1">{label}</p>
           </div>
         ))}
       </div>

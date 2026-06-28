@@ -59,7 +59,7 @@ export default function FloorEditor({
         <button
           onClick={() => { setViewMode('booking'); setLayoutEditing(false) }}
           className={`text-sm px-4 py-2 transition-colors ${
-            viewMode === 'booking' ? 'bg-wine text-white' : 'text-stone-500 hover:bg-[#F0EBE1]'
+            viewMode === 'booking' ? 'bg-clay text-white' : 'text-ink-soft hover:bg-surface-sunk'
           }`}
         >
           {t.bookingView}
@@ -67,7 +67,7 @@ export default function FloorEditor({
         <button
           onClick={() => setViewMode('layout')}
           className={`text-sm px-4 py-2 border-l border-line transition-colors ${
-            viewMode === 'layout' ? 'bg-wine text-white' : 'text-stone-500 hover:bg-[#F0EBE1]'
+            viewMode === 'layout' ? 'bg-clay text-white' : 'text-ink-soft hover:bg-surface-sunk'
           }`}
         >
           {t.editLayout}
@@ -89,8 +89,8 @@ export default function FloorEditor({
               onClick={() => setLayoutEditing(e => !e)}
               className={`text-sm px-4 py-2 rounded-md border transition-colors ${
                 layoutEditing
-                  ? 'bg-wine text-white border-wine hover:bg-wine/90'
-                  : 'border-line text-ink hover:bg-[#F0EBE1]'
+                  ? 'bg-clay text-white border-clay hover:bg-clay-dark'
+                  : 'border-line text-ink hover:bg-surface-sunk'
               }`}
             >
               {layoutEditing ? t.done : t.edit}
@@ -99,7 +99,7 @@ export default function FloorEditor({
               <button
                 onClick={handleAdd}
                 disabled={isPending}
-                className="text-sm px-4 py-2 bg-wine text-white rounded-md hover:bg-wine/90 disabled:opacity-50"
+                className="text-sm px-4 py-2 bg-clay text-white rounded-md hover:bg-clay-dark disabled:opacity-50"
               >
                 {t.addTable}
               </button>

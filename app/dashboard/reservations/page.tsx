@@ -34,7 +34,7 @@ export default async function ReservationsPage() {
   if (!restaurant) {
     return (
       <div className="p-10">
-        <Link href="/dashboard" className="text-sm text-stone-400 hover:text-ink">
+        <Link href="/dashboard" className="text-sm text-ink-faint hover:text-ink">
           {dict.common.backToDashboard}
         </Link>
         <p className="text-red-600 text-sm mt-6">{dict.common.noRestaurantFound}</p>
@@ -59,7 +59,7 @@ export default async function ReservationsPage() {
   return (
     <div className="p-10 max-w-5xl">
       <div className="mb-8">
-        <Link href="/dashboard" className="text-sm text-stone-400 hover:text-ink">
+        <Link href="/dashboard" className="text-sm text-ink-faint hover:text-ink">
           {dict.common.backToDashboard}
         </Link>
         <h1 className="font-display font-medium text-3xl text-ink mt-2">{dict.reservations.heading}</h1>
@@ -70,7 +70,7 @@ export default async function ReservationsPage() {
       )}
 
       {!error && reservations?.length === 0 && (
-        <p className="text-stone-500 text-sm">{dict.reservations.noReservationsFound}</p>
+        <p className="text-ink-soft text-sm">{dict.reservations.noReservationsFound}</p>
       )}
 
       {!error && reservations && reservations.length > 0 && (
@@ -78,12 +78,12 @@ export default async function ReservationsPage() {
           <table className="w-full text-sm border-collapse">
             <thead>
               <tr className="border-b border-line text-left">
-                <th className="pb-3 pr-8 text-xs font-normal uppercase tracking-wide text-stone-400">{dict.reservations.colNome}</th>
-                <th className="pb-3 pr-8 text-xs font-normal uppercase tracking-wide text-stone-400">{dict.reservations.colData}</th>
-                <th className="pb-3 pr-8 text-xs font-normal uppercase tracking-wide text-stone-400">{dict.reservations.colOra}</th>
-                <th className="pb-3 pr-8 text-xs font-normal uppercase tracking-wide text-stone-400">{dict.reservations.colOspiti}</th>
-                <th className="pb-3 pr-8 text-xs font-normal uppercase tracking-wide text-stone-400">{dict.reservations.colStato}</th>
-                <th className="pb-3 text-xs font-normal uppercase tracking-wide text-stone-400">{dict.reservations.colTable}</th>
+                <th className="pb-3 pr-8 text-xs font-normal uppercase tracking-wide text-ink-faint">{dict.reservations.colNome}</th>
+                <th className="pb-3 pr-8 text-xs font-normal uppercase tracking-wide text-ink-faint">{dict.reservations.colData}</th>
+                <th className="pb-3 pr-8 text-xs font-normal uppercase tracking-wide text-ink-faint">{dict.reservations.colOra}</th>
+                <th className="pb-3 pr-8 text-xs font-normal uppercase tracking-wide text-ink-faint">{dict.reservations.colOspiti}</th>
+                <th className="pb-3 pr-8 text-xs font-normal uppercase tracking-wide text-ink-faint">{dict.reservations.colStato}</th>
+                <th className="pb-3 text-xs font-normal uppercase tracking-wide text-ink-faint">{dict.reservations.colTable}</th>
               </tr>
             </thead>
             <tbody>
@@ -100,11 +100,11 @@ export default async function ReservationsPage() {
                     <td className="py-3 pr-8 text-ink">{r.ospiti}</td>
                     <td className="py-3 pr-8">
                       {cancelled ? (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-[#E8E4DE] text-stone-400">
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-surface-sunk text-ink-faint">
                           {dict.reservations.statoCancellata}
                         </span>
                       ) : (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-[#E6EDE4] text-sage">
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-sage-tint text-sage">
                           {r.stato}
                         </span>
                       )}

@@ -25,18 +25,18 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const locale = await getLocale()
 
   return (
-    <div className="flex min-h-screen bg-paper">
+    <div className="flex min-h-screen bg-bg">
       <aside className="w-56 flex-shrink-0 flex flex-col border-r border-line">
         <div className="px-5 py-5 border-b border-line">
           <p className="font-display font-medium text-sm text-ink leading-snug truncate">
             {restaurant?.nome_ristorante ?? '—'}
           </p>
-          <p className="text-xs text-stone-400 mt-0.5 truncate">{user.email}</p>
+          <p className="text-xs text-ink-faint mt-0.5 truncate">{user.email}</p>
         </div>
         <SidebarNav locale={locale} />
         <div className="mt-auto px-5 py-4 border-t border-line">
           <form action={signOut}>
-            <button type="submit" className="text-xs text-stone-400 hover:text-ink transition-colors">
+            <button type="submit" className="text-xs text-ink-faint hover:text-ink transition-colors">
               Log out
             </button>
           </form>

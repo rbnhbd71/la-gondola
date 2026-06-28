@@ -22,7 +22,7 @@ export default async function FloorPlanPage() {
   if (!restaurant) {
     return (
       <div className="p-10">
-        <Link href="/dashboard" className="text-sm text-stone-400 hover:text-ink">
+        <Link href="/dashboard" className="text-sm text-ink-faint hover:text-ink">
           {dict.common.backToDashboard}
         </Link>
         <p className="text-red-600 text-sm mt-6">{dict.common.noRestaurantFound}</p>
@@ -39,7 +39,7 @@ export default async function FloorPlanPage() {
   return (
     <div className="p-10">
       <div className="mb-8">
-        <Link href="/dashboard" className="text-sm text-stone-400 hover:text-ink">
+        <Link href="/dashboard" className="text-sm text-ink-faint hover:text-ink">
           {dict.common.backToDashboard}
         </Link>
         <h1 className="font-display font-medium text-3xl text-ink mt-2">{dict.floorPlan.heading}</h1>

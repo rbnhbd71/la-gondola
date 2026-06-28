@@ -32,7 +32,7 @@ export default function TableSelect({
       value={value}
       onChange={handleChange}
       disabled={isPending}
-      className="text-sm border border-line rounded-md px-2 py-1 bg-paper text-ink focus:outline-none focus:ring-2 focus:ring-line disabled:opacity-50"
+      className="text-sm border border-line rounded-md px-2 py-1 bg-surface text-ink focus:outline-none focus:ring-2 focus:ring-line disabled:opacity-50"
     >
       <option value="">{unassignedLabel}</option>
       {tables.map(t => (

@@ -62,7 +62,7 @@ export default function BirthdayCell({
           disabled={isPending}
           className="text-xs border border-line rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-line disabled:opacity-50"
         />
-        {isPending && <span className="text-xs text-stone-400">{tSaving}</span>}
+        {isPending && <span className="text-xs text-ink-faint">{tSaving}</span>}
       </div>
     )
   }
@@ -76,7 +76,7 @@ export default function BirthdayCell({
       )}
       <button
         onClick={() => { setEditing(true); setStatus('idle') }}
-        className="text-xs text-stone-400 hover:text-ink"
+        className="text-xs text-ink-faint hover:text-ink"
       >
         {tEdit}
       </button>

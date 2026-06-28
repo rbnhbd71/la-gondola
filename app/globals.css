@@ -1,13 +1,23 @@
 @import "tailwindcss";
 
-/* ── Warm palette tokens ─────────────────────────────────────────── */
+/* ── Design tokens ───────────────────────────────────────────────── */
 :root {
-  --ink:   #1C1A17;
-  --paper: #FAF7F2;
-  --wine:  #6B1F2A;
-  --gold:  #B08D57;
-  --sage:  #7A8B72;
-  --line:  #E5DFD3;
+  --bg:           #FAF8F4;
+  --surface:      #FFFFFF;
+  --surface-sunk: #F4F1EA;
+  --ink:          #211E1A;
+  --ink-soft:     #6B655C;
+  --ink-faint:    #9C958A;
+  --line:         #E8E2D6;
+  --clay:         #C2693D;
+  --clay-dark:    #9A4E2A;
+  --clay-tint:    #F6E3D7;
+  --sage:         #74875F;
+  --sage-tint:    #E7EEE0;
+  --sky:          #5C7C8C;
+  --sky-tint:     #E2EBED;
+  --amber:        #C99A3C;
+  --amber-tint:   #F6ECD8;
 
   --font-display: var(--font-fraunces);
   --font-body:    var(--font-inter);
@@ -15,19 +25,29 @@
 
 /* ── Tailwind v4 theme registration ──────────────────────────────── */
 @theme inline {
-  --color-ink:   var(--ink);
-  --color-paper: var(--paper);
-  --color-wine:  var(--wine);
-  --color-gold:  var(--gold);
-  --color-sage:  var(--sage);
-  --color-line:  var(--line);
+  --color-bg:           var(--bg);
+  --color-surface:      var(--surface);
+  --color-surface-sunk: var(--surface-sunk);
+  --color-ink:          var(--ink);
+  --color-ink-soft:     var(--ink-soft);
+  --color-ink-faint:    var(--ink-faint);
+  --color-line:         var(--line);
+  --color-clay:         var(--clay);
+  --color-clay-dark:    var(--clay-dark);
+  --color-clay-tint:    var(--clay-tint);
+  --color-sage:         var(--sage);
+  --color-sage-tint:    var(--sage-tint);
+  --color-sky:          var(--sky);
+  --color-sky-tint:     var(--sky-tint);
+  --color-amber:        var(--amber);
+  --color-amber-tint:   var(--amber-tint);
 
   --font-display: var(--font-fraunces);
   --font-body:    var(--font-inter);
 }
 
 body {
-  background-color: var(--paper);
+  background-color: var(--bg);
   color: var(--ink);
   font-family: var(--font-body), system-ui, sans-serif;
 }

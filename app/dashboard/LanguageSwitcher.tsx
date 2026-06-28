@@ -21,7 +21,7 @@ export default function LanguageSwitcher({ current }: { current: Locale }) {
         startTransition(async () => { await setLocale(locale) })
       }}
       disabled={isPending}
-      className="text-sm text-ink bg-paper border border-line rounded-lg px-3 py-1.5 shadow-sm focus:outline-none focus:ring-1 focus:ring-line cursor-pointer disabled:opacity-50"
+      className="text-sm text-ink bg-surface border border-line rounded-lg px-3 py-1.5 shadow-sm focus:outline-none focus:ring-1 focus:ring-line cursor-pointer disabled:opacity-50"
     >
       {options.map(({ value, label }) => (
         <option key={value} value={value}>{label}</option>

@@ -26,8 +26,8 @@ export default function SidebarNav({ locale }: { locale: Locale }) {
             href={href}
             className={`text-sm py-2 px-5 border-l-2 transition-colors ${
               active
-                ? 'border-gold text-ink font-medium'
-                : 'border-transparent text-stone-400 hover:text-ink'
+                ? 'border-amber text-ink font-medium'
+                : 'border-transparent text-ink-faint hover:text-ink'
             }`}
           >
             {label}
