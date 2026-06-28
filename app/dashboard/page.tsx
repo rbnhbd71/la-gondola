@@ -27,6 +27,9 @@ export default async function DashboardPage() {
         <Link href="/dashboard/customers" className="text-sm text-blue-600 hover:underline">
           Customers →
         </Link>
+        <Link href="/dashboard/settings" className="text-sm text-blue-600 hover:underline">
+          Settings →
+        </Link>
       </nav>
       <form action={signOut} className="mt-8">
         <button
