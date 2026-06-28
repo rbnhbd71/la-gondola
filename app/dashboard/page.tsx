@@ -1,13 +1,47 @@
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getLocale } from '@/lib/i18n/getLocale'
 import { dictionary } from '@/lib/i18n/dictionary'
+import { CalendarDays, UserPlus, Users, MessageCircle } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
+
+function formatTime(timeStr: string) {
+  return timeStr?.slice(0, 5) ?? ''
+}
+
+function StatCard({
+  icon: Icon,
+  iconBg,
+  iconColor,
+  label,
+  value,
+  note,
+}: {
+  icon: LucideIcon
+  iconBg: string
+  iconColor: string
+  label: string
+  value: string | number
+  note?: string
+}) {
+  return (
+    <div className="bg-surface rounded-xl border border-line p-5">
+      <div className="flex items-center gap-2 mb-3">
+        <div className={`p-2 rounded-lg ${iconBg}`}>
+          <Icon className={`w-4 h-4 ${iconColor}`} />
+        </div>
+        <p className="text-xs text-ink-faint uppercase tracking-wide">{label}</p>
+      </div>
+      <p className="font-display font-medium text-4xl text-ink">{value}</p>
+      {note && <p className="text-xs text-ink-faint mt-1.5 italic">{note}</p>}
+    </div>
+  )
+}
 
 export default async function DashboardPage() {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
   const locale = await getLocale()
@@ -15,7 +49,7 @@ export default async function DashboardPage() {
 
   const { data: restaurant } = await supabase
     .from('restaurants')
-    .select('id')
+    .select('id, nome_ristorante')
     .eq('owner_id', user.id)
     .single()
 
@@ -27,10 +61,43 @@ export default async function DashboardPage() {
     )
   }
 
-  const today = new Date().toISOString().split('T')[0]
-  const in7Days = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+  const now = new Date()
+  const today = now.toISOString().split('T')[0]
+  const hour = now.getHours()
+  const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+  const service: 'lunch' | 'dinner' = hour < 16 ? 'lunch' : 'dinner'
 
-  const [todayResult, weekResult, customerResult] = await Promise.all([
+  const greeting =
+    hour < 12 ? dict.dashboard.greetingMorning
+    : hour < 17 ? dict.dashboard.greetingAfternoon
+    : dict.dashboard.greetingEvening
+
+  const formattedDate = new Intl.DateTimeFormat(locale, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(now)
+
+  let floorResQuery = supabase
+    .from('reservations')
+    .select('table_id')
+    .eq('restaurant_id', restaurant.id)
+    .eq('data', today)
+    .neq('stato', 'cancellata')
+    .not('table_id', 'is', null)
+  if (service === 'lunch') floorResQuery = floorResQuery.lt('ora', '16:00:00')
+  else floorResQuery = floorResQuery.gte('ora', '16:00:00')
+
+  const [
+    { count: todayCount },
+    { count: newCustomersCount },
+    { data: upcoming },
+    { data: tables },
+    { data: floorReservations },
+    { count: birthdaySentCount },
+    { data: topCustomers },
+  ] = await Promise.all([
     supabase
       .from('reservations')
       .select('*', { count: 'exact', head: true })
@@ -38,35 +105,227 @@ export default async function DashboardPage() {
       .eq('data', today)
       .neq('stato', 'cancellata'),
     supabase
-      .from('reservations')
+      .from('customers')
       .select('*', { count: 'exact', head: true })
       .eq('restaurant_id', restaurant.id)
+      .gte('created_at', firstOfMonth),
+    supabase
+      .from('reservations')
+      .select('id, nome, data, ora, ospiti, stato, table_id')
+      .eq('restaurant_id', restaurant.id)
       .gte('data', today)
-      .lt('data', in7Days)
-      .neq('stato', 'cancellata'),
+      .neq('stato', 'cancellata')
+      .order('data', { ascending: true })
+      .order('ora', { ascending: true })
+      .limit(8),
+    supabase
+      .from('tables')
+      .select('id, label, capacity')
+      .eq('restaurant_id', restaurant.id)
+      .order('label', { ascending: true }),
+    floorResQuery,
     supabase
       .from('customers')
       .select('*', { count: 'exact', head: true })
-      .eq('restaurant_id', restaurant.id),
+      .eq('restaurant_id', restaurant.id)
+      .not('ultimo_messaggio_compleanno', 'is', null),
+    supabase
+      .from('customers')
+      .select('id, nome, visite')
+      .eq('restaurant_id', restaurant.id)
+      .order('visite', { ascending: false })
+      .limit(5),
   ])
 
-  const stats = [
-    { label: dict.dashboard.todaysReservations, value: todayResult.count },
-    { label: dict.dashboard.next7Days, value: weekResult.count },
-    { label: dict.dashboard.totalCustomers, value: customerResult.count },
-  ]
+  const tableLabel = new Map((tables ?? []).map(t => [t.id, t.label]))
+  const bookedTableIds = new Set(
+    (floorReservations ?? []).map(r => r.table_id as string)
+  )
 
   return (
-    <div className="p-10">
-      <h1 className="font-display font-medium text-3xl text-ink mb-8">{dict.dashboard.heading}</h1>
-      <div className="grid grid-cols-3 gap-3">
-        {stats.map(({ label, value }) => (
-          <div key={label} className="bg-surface-sunk rounded-xl p-5">
-            <p className="font-display font-medium text-4xl text-clay">{value ?? '—'}</p>
-            <p className="text-sm text-ink-soft mt-1">{label}</p>
-          </div>
-        ))}
+    <div className="p-10 max-w-6xl">
+
+      {/* ── Greeting ─────────────────────────────────────────────── */}
+      <div className="mb-8">
+        <p className="text-xs text-ink-faint uppercase tracking-wide mb-1">
+          {formattedDate}
+        </p>
+        <h1 className="font-display font-medium text-3xl text-ink">
+          {greeting}, {restaurant.nome_ristorante}
+        </h1>
       </div>
+
+      {/* ── Stat cards ───────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <StatCard
+          icon={CalendarDays}
+          iconBg="bg-clay-tint"
+          iconColor="text-clay-dark"
+          label={dict.dashboard.statReservationsToday}
+          value={todayCount ?? 0}
+        />
+        <StatCard
+          icon={UserPlus}
+          iconBg="bg-sky-tint"
+          iconColor="text-sky"
+          label={dict.dashboard.statNewCustomers}
+          value={newCustomersCount ?? 0}
+        />
+        <StatCard
+          icon={Users}
+          iconBg="bg-sage-tint"
+          iconColor="text-sage"
+          label={dict.dashboard.statOccupancy}
+          value="78%"
+          note={dict.dashboard.estimateNote}
+        />
+        <StatCard
+          icon={MessageCircle}
+          iconBg="bg-amber-tint"
+          iconColor="text-amber"
+          label={dict.dashboard.statAiHandled}
+          value="91%"
+          note={dict.dashboard.estimateNote}
+        />
+      </div>
+
+      {/* ── Upcoming + mini floor plan ────────────────────────────── */}
+      <div className="grid grid-cols-3 gap-6 mb-8">
+
+        {/* Upcoming reservations */}
+        <div className="col-span-2 bg-surface rounded-xl border border-line p-6">
+          <h2 className="font-display font-medium text-lg text-ink mb-4">
+            {dict.dashboard.upcomingHeading}
+          </h2>
+          {!upcoming || upcoming.length === 0 ? (
+            <p className="text-sm text-ink-soft">{dict.dashboard.noUpcoming}</p>
+          ) : (
+            <div className="divide-y divide-line">
+              {upcoming.map((r) => (
+                <div key={r.id} className="flex items-center gap-4 py-3 text-sm">
+                  <span className="text-ink-faint w-11 shrink-0 tabular-nums">
+                    {formatTime(r.ora)}
+                  </span>
+                  <span className="font-medium text-ink flex-1 truncate">
+                    {r.nome ?? '—'}
+                  </span>
+                  <span className="text-ink-soft shrink-0">
+                    {r.ospiti} {dict.floorPlan.guests}
+                  </span>
+                  <span className="text-ink-faint shrink-0 w-16 text-right truncate">
+                    {r.table_id ? (tableLabel.get(r.table_id) ?? '—') : '—'}
+                  </span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${
+                    r.stato === 'cancellata'
+                      ? 'bg-surface-sunk text-ink-faint'
+                      : 'bg-sage-tint text-sage'
+                  }`}>
+                    {r.stato === 'cancellata' ? dict.reservations.statoCancellata : r.stato}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Mini floor plan */}
+        <div className="bg-surface rounded-xl border border-line p-6 flex flex-col">
+          <h2 className="font-display font-medium text-lg text-ink mb-1">
+            {dict.dashboard.floorTonightHeading}
+          </h2>
+          <p className="text-xs text-ink-faint mb-4">
+            {service === 'lunch' ? dict.dashboard.floorLunch : dict.dashboard.floorDinner}
+          </p>
+          {!tables || tables.length === 0 ? (
+            <p className="text-sm text-ink-soft flex-1">{dict.floorPlan.noTablesFound}</p>
+          ) : (
+            <div className="flex flex-wrap gap-2 flex-1 content-start">
+              {tables.map((t) => (
+                <div
+                  key={t.id}
+                  className={`px-3 py-2 rounded-lg text-xs font-medium ${
+                    bookedTableIds.has(t.id)
+                      ? 'bg-clay-tint text-clay-dark'
+                      : 'bg-surface-sunk text-ink-soft'
+                  }`}
+                >
+                  {t.label}
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="flex gap-4 text-xs text-ink-faint mt-4">
+            <span className="flex items-center gap-1.5">
+              <span className="inline-block w-2.5 h-2.5 rounded-full bg-clay" />
+              {dict.dashboard.legendBooked}
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="inline-block w-2.5 h-2.5 rounded-full bg-line" />
+              {dict.dashboard.legendFree}
+            </span>
+          </div>
+          <Link
+            href="/dashboard/floor-plan"
+            className="text-xs text-clay-dark hover:text-clay mt-3 transition-colors"
+          >
+            {dict.dashboard.viewFloorPlan}
+          </Link>
+        </div>
+      </div>
+
+      {/* ── Campaigns strip ──────────────────────────────────────── */}
+      <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="bg-surface-sunk rounded-xl p-5">
+          <h3 className="font-display font-medium text-base text-ink mb-3">
+            {dict.campaigns.birthdayMessages}
+          </h3>
+          <p className="font-display font-medium text-4xl text-clay mb-1">
+            {birthdaySentCount ?? 0}
+          </p>
+          <p className="text-xs text-ink-soft">{dict.dashboard.birthdaySentLabel}</p>
+        </div>
+        <div className="bg-surface-sunk rounded-xl p-5">
+          <h3 className="font-display font-medium text-base text-ink mb-2">
+            {dict.campaigns.winbackTitle}
+          </h3>
+          <p className="text-sm text-ink-soft mb-4">{dict.campaigns.winbackDescription}</p>
+          <span className="inline-block text-xs px-2.5 py-1 rounded-full bg-clay-tint text-ink-soft">
+            {dict.campaigns.comingSoon}
+          </span>
+        </div>
+        <div className="bg-surface-sunk rounded-xl p-5">
+          <h3 className="font-display font-medium text-base text-ink mb-2">
+            {dict.campaigns.seasonalTitle}
+          </h3>
+          <p className="text-sm text-ink-soft mb-4">{dict.campaigns.seasonalDescription}</p>
+          <span className="inline-block text-xs px-2.5 py-1 rounded-full bg-clay-tint text-ink-soft">
+            {dict.campaigns.comingSoon}
+          </span>
+        </div>
+      </div>
+
+      {/* ── Top customers ────────────────────────────────────────── */}
+      <div className="bg-surface rounded-xl border border-line p-6">
+        <h2 className="font-display font-medium text-lg text-ink mb-4">
+          {dict.dashboard.topCustomersHeading}
+        </h2>
+        {!topCustomers || topCustomers.length === 0 ? (
+          <p className="text-sm text-ink-soft">{dict.customers.noCustomersFound}</p>
+        ) : (
+          <div className="divide-y divide-line">
+            {topCustomers.map((c, i) => (
+              <div key={c.id} className="flex items-center gap-4 py-3 text-sm">
+                <span className="text-ink-faint w-5 text-center shrink-0">{i + 1}</span>
+                <span className="font-medium text-ink flex-1 truncate">{c.nome ?? '—'}</span>
+                <span className="text-ink-soft shrink-0">
+                  {c.visite} {dict.dashboard.visits}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
     </div>
   )
 }

@@ -24,10 +24,10 @@ export default function SidebarNav({ locale }: { locale: Locale }) {
           <Link
             key={href}
             href={href}
-            className={`text-sm py-2 px-5 border-l-2 transition-colors ${
+            className={`text-sm py-2 px-4 mx-2 rounded-md transition-colors ${
               active
-                ? 'border-amber text-ink font-medium'
-                : 'border-transparent text-ink-faint hover:text-ink'
+                ? 'bg-clay-tint text-clay-dark font-medium'
+                : 'text-ink-faint hover:text-ink hover:bg-surface-sunk'
             }`}
           >
             {label}

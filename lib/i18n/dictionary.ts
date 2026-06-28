@@ -22,9 +22,25 @@ export type Dictionary = {
   }
   dashboard: {
     heading: string
-    todaysReservations: string
-    next7Days: string
-    totalCustomers: string
+    greetingMorning: string
+    greetingAfternoon: string
+    greetingEvening: string
+    statReservationsToday: string
+    statNewCustomers: string
+    statOccupancy: string
+    statAiHandled: string
+    estimateNote: string
+    upcomingHeading: string
+    noUpcoming: string
+    floorTonightHeading: string
+    floorLunch: string
+    floorDinner: string
+    viewFloorPlan: string
+    legendBooked: string
+    legendFree: string
+    birthdaySentLabel: string
+    topCustomersHeading: string
+    visits: string
   }
   reservations: {
     heading: string
@@ -120,9 +136,25 @@ const en: Dictionary = {
   },
   dashboard: {
     heading: 'Overview',
-    todaysReservations: "Today's reservations",
-    next7Days: 'Next 7 days',
-    totalCustomers: 'Total customers',
+    greetingMorning: 'Good morning',
+    greetingAfternoon: 'Good afternoon',
+    greetingEvening: 'Good evening',
+    statReservationsToday: "Today's reservations",
+    statNewCustomers: 'New customers this month',
+    statOccupancy: 'Avg. occupancy',
+    statAiHandled: 'Handled by AI',
+    estimateNote: 'Estimate — full tracking coming soon',
+    upcomingHeading: 'Upcoming reservations',
+    noUpcoming: 'No upcoming reservations.',
+    floorTonightHeading: 'Floor plan — tonight',
+    floorLunch: 'Lunch service',
+    floorDinner: 'Dinner service',
+    viewFloorPlan: 'View full floor plan →',
+    legendBooked: 'Booked',
+    legendFree: 'Free',
+    birthdaySentLabel: 'customers reached via birthday messages',
+    topCustomersHeading: 'Top customers',
+    visits: 'visits',
   },
   reservations: {
     heading: 'Reservations',
@@ -216,9 +248,25 @@ const it: Dictionary = {
   },
   dashboard: {
     heading: 'Panoramica',
-    todaysReservations: 'Prenotazioni di oggi',
-    next7Days: 'Prossimi 7 giorni',
-    totalCustomers: 'Clienti totali',
+    greetingMorning: 'Buongiorno',
+    greetingAfternoon: 'Buon pomeriggio',
+    greetingEvening: 'Buonasera',
+    statReservationsToday: 'Prenotazioni di oggi',
+    statNewCustomers: 'Nuovi clienti questo mese',
+    statOccupancy: 'Occupazione media',
+    statAiHandled: "Gestite dall'IA",
+    estimateNote: 'Stima — tracciamento completo in arrivo',
+    upcomingHeading: 'Prossime prenotazioni',
+    noUpcoming: 'Nessuna prenotazione imminente.',
+    floorTonightHeading: 'Pianta sala — stasera',
+    floorLunch: 'Servizio pranzo',
+    floorDinner: 'Servizio cena',
+    viewFloorPlan: 'Vedi pianta completa →',
+    legendBooked: 'Occupato',
+    legendFree: 'Libero',
+    birthdaySentLabel: 'clienti raggiunti con messaggi di compleanno',
+    topCustomersHeading: 'Clienti top',
+    visits: 'visite',
   },
   reservations: {
     heading: 'Prenotazioni',
@@ -312,9 +360,25 @@ const fr: Dictionary = {
   },
   dashboard: {
     heading: 'Aperçu',
-    todaysReservations: "Réservations d'aujourd'hui",
-    next7Days: '7 prochains jours',
-    totalCustomers: 'Clients au total',
+    greetingMorning: 'Bonjour',
+    greetingAfternoon: 'Bon après-midi',
+    greetingEvening: 'Bonsoir',
+    statReservationsToday: "Réservations d'aujourd'hui",
+    statNewCustomers: 'Nouveaux clients ce mois',
+    statOccupancy: 'Occupation moyenne',
+    statAiHandled: "Géré par l'IA",
+    estimateNote: 'Estimation — suivi complet bientôt disponible',
+    upcomingHeading: 'Réservations à venir',
+    noUpcoming: 'Aucune réservation à venir.',
+    floorTonightHeading: 'Plan de salle — ce soir',
+    floorLunch: 'Service du déjeuner',
+    floorDinner: 'Service du dîner',
+    viewFloorPlan: 'Voir le plan complet →',
+    legendBooked: 'Réservée',
+    legendFree: 'Libre',
+    birthdaySentLabel: "clients atteints via messages d'anniversaire",
+    topCustomersHeading: 'Meilleurs clients',
+    visits: 'visites',
   },
   reservations: {
     heading: 'Réservations',
@@ -408,9 +472,25 @@ const es: Dictionary = {
   },
   dashboard: {
     heading: 'Resumen',
-    todaysReservations: 'Reservas de hoy',
-    next7Days: 'Próximos 7 días',
-    totalCustomers: 'Clientes totales',
+    greetingMorning: 'Buenos días',
+    greetingAfternoon: 'Buenas tardes',
+    greetingEvening: 'Buenas noches',
+    statReservationsToday: 'Reservas de hoy',
+    statNewCustomers: 'Nuevos clientes este mes',
+    statOccupancy: 'Ocupación media',
+    statAiHandled: 'Gestionadas por IA',
+    estimateNote: 'Estimación — seguimiento completo próximamente',
+    upcomingHeading: 'Próximas reservas',
+    noUpcoming: 'No hay próximas reservas.',
+    floorTonightHeading: 'Plano de sala — esta noche',
+    floorLunch: 'Servicio de almuerzo',
+    floorDinner: 'Servicio de cena',
+    viewFloorPlan: 'Ver plano completo →',
+    legendBooked: 'Ocupada',
+    legendFree: 'Libre',
+    birthdaySentLabel: 'clientes alcanzados vía mensajes de cumpleaños',
+    topCustomersHeading: 'Clientes top',
+    visits: 'visitas',
   },
   reservations: {
     heading: 'Reservas',
