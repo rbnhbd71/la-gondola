@@ -39,6 +39,56 @@ function StatCard({
   )
 }
 
+function RingChart({
+  pct,
+  color,
+  label,
+  note,
+}: {
+  pct: number
+  color: string
+  label: string
+  note?: string
+}) {
+  const r = 28
+  const c = 2 * Math.PI * r
+  const safe = Number.isFinite(pct) ? Math.max(0, Math.min(100, pct)) : 0
+  const dash = (safe / 100) * c
+  return (
+    <div className="flex flex-col items-center gap-1.5">
+      <svg width="80" height="80" viewBox="0 0 80 80" aria-hidden="true">
+        <circle cx="40" cy="40" r={r} fill="none" stroke="var(--line)" strokeWidth="7" />
+        <circle
+          cx="40" cy="40" r={r}
+          fill="none"
+          stroke={color}
+          strokeWidth="7"
+          strokeLinecap="round"
+          strokeDasharray={`${dash} ${c - dash}`}
+          transform="rotate(-90 40 40)"
+        />
+        <text
+          x="40" y="40"
+          textAnchor="middle"
+          dominantBaseline="middle"
+          fontSize="14"
+          fontWeight="500"
+          fill="var(--ink)"
+          className="font-display"
+        >
+          {safe}%
+        </text>
+      </svg>
+      <p className="text-xs text-ink-soft text-center leading-tight max-w-[80px]">{label}</p>
+      {note && (
+        <p className="text-[10px] text-ink-faint italic text-center leading-tight max-w-[80px]">
+          {note}
+        </p>
+      )}
+    </div>
+  )
+}
+
 export default async function DashboardPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -65,6 +115,7 @@ export default async function DashboardPage() {
   const today = now.toISOString().split('T')[0]
   const hour = now.getHours()
   const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+  const firstOfMonthDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
   const service: 'lunch' | 'dinner' = hour < 16 ? 'lunch' : 'dinner'
 
   const greeting =
@@ -97,6 +148,9 @@ export default async function DashboardPage() {
     { data: floorReservations },
     { count: birthdaySentCount },
     { data: topCustomers },
+    { data: resThisMonth },
+    { count: repeatCustomersCount },
+    { count: totalCustomersCount },
   ] = await Promise.all([
     supabase
       .from('reservations')
@@ -135,12 +189,35 @@ export default async function DashboardPage() {
       .eq('restaurant_id', restaurant.id)
       .order('visite', { ascending: false })
       .limit(5),
+    supabase
+      .from('reservations')
+      .select('stato')
+      .eq('restaurant_id', restaurant.id)
+      .gte('data', firstOfMonthDate),
+    supabase
+      .from('customers')
+      .select('*', { count: 'exact', head: true })
+      .eq('restaurant_id', restaurant.id)
+      .gt('visite', 1),
+    supabase
+      .from('customers')
+      .select('*', { count: 'exact', head: true })
+      .eq('restaurant_id', restaurant.id),
   ])
 
   const tableLabel = new Map((tables ?? []).map(t => [t.id, t.label]))
   const bookedTableIds = new Set(
     (floorReservations ?? []).map(r => r.table_id as string)
   )
+
+  const totalThisMonth = (resThisMonth ?? []).length
+  const nonCancelledThisMonth = (resThisMonth ?? []).filter(r => r.stato !== 'cancellata').length
+  const fulfillmentPct = totalThisMonth > 0
+    ? Math.round(nonCancelledThisMonth / totalThisMonth * 100)
+    : 0
+  const repeatPct = (totalCustomersCount ?? 0) > 0
+    ? Math.round((repeatCustomersCount ?? 0) / (totalCustomersCount ?? 0) * 100)
+    : 0
 
   return (
     <div className="p-10 max-w-6xl">
@@ -270,6 +347,34 @@ export default async function DashboardPage() {
           >
             {dict.dashboard.viewFloorPlan}
           </Link>
+        </div>
+      </div>
+
+      {/* ── Performance rings ────────────────────────────────────── */}
+      <div className="bg-surface rounded-xl border border-line px-8 py-6 mb-8">
+        <div className="grid grid-cols-4 gap-4">
+          <RingChart
+            pct={78}
+            color="#C2693D"
+            label={dict.dashboard.perfOccupancy}
+            note={dict.dashboard.estimateNote}
+          />
+          <RingChart
+            pct={fulfillmentPct}
+            color="#74875F"
+            label={dict.dashboard.perfFulfillment}
+          />
+          <RingChart
+            pct={repeatPct}
+            color="#5C7C8C"
+            label={dict.dashboard.perfRepeatCustomers}
+          />
+          <RingChart
+            pct={91}
+            color="#C99A3C"
+            label={dict.dashboard.perfAiHandled}
+            note={dict.dashboard.estimateNote}
+          />
         </div>
       </div>
 

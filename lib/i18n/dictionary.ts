@@ -42,6 +42,10 @@ export type Dictionary = {
     birthdaySentLabel: string
     topCustomersHeading: string
     visits: string
+    perfOccupancy: string
+    perfFulfillment: string
+    perfRepeatCustomers: string
+    perfAiHandled: string
   }
   reservations: {
     heading: string
@@ -169,6 +173,10 @@ const en: Dictionary = {
     birthdaySentLabel: 'customers reached via birthday messages',
     topCustomersHeading: 'Top customers',
     visits: 'visits',
+    perfOccupancy: 'Occupancy',
+    perfFulfillment: 'Fulfillment',
+    perfRepeatCustomers: 'Repeat guests',
+    perfAiHandled: 'AI handled',
   },
   reservations: {
     heading: 'Reservations',
@@ -294,6 +302,10 @@ const it: Dictionary = {
     birthdaySentLabel: 'clienti raggiunti con messaggi di compleanno',
     topCustomersHeading: 'Clienti top',
     visits: 'visite',
+    perfOccupancy: 'Occupazione',
+    perfFulfillment: 'Conferme',
+    perfRepeatCustomers: 'Abituali',
+    perfAiHandled: 'Gestiti AI',
   },
   reservations: {
     heading: 'Prenotazioni',
@@ -419,6 +431,10 @@ const fr: Dictionary = {
     birthdaySentLabel: "clients atteints via messages d'anniversaire",
     topCustomersHeading: 'Meilleurs clients',
     visits: 'visites',
+    perfOccupancy: 'Occupation',
+    perfFulfillment: 'Confirmations',
+    perfRepeatCustomers: 'Fidèles',
+    perfAiHandled: 'Géré par IA',
   },
   reservations: {
     heading: 'Réservations',
@@ -544,6 +560,10 @@ const es: Dictionary = {
     birthdaySentLabel: 'clientes alcanzados vía mensajes de cumpleaños',
     topCustomersHeading: 'Clientes top',
     visits: 'visitas',
+    perfOccupancy: 'Ocupación',
+    perfFulfillment: 'Confirmaciones',
+    perfRepeatCustomers: 'Habituales',
+    perfAiHandled: 'Gestionado IA',
   },
   reservations: {
     heading: 'Reservas',
