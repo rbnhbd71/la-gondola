@@ -6,6 +6,8 @@ import {
 import type { MonthBucket } from './types'
 
 type Range = 1 | 3 | 6
+type RawRes = { data: string; stato: string }
+type ChartPoint = { label: string; reservations: number }
 
 type StatsDict = {
   heading: string
@@ -20,11 +22,117 @@ type StatsDict = {
   noDataYet: string
 }
 
-function formatMonth(key: string, locale: string): string {
-  const [y, m] = key.split('-')
-  const d = new Date(Number(y), Number(m) - 1, 1)
-  return d.toLocaleDateString(locale, { month: 'short', year: '2-digit' })
+// ── Date helpers ──────────────────────────────────────────────────────────────
+
+function padDate(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
+
+// ISO-week Monday (Mon–Sun, ISO 8601) for a YYYY-MM-DD string.
+function isoWeekMonday(dateStr: string): string {
+  const d = new Date(dateStr + 'T12:00:00')
+  const dow = d.getDay() // 0=Sun … 6=Sat
+  d.setDate(d.getDate() - (dow === 0 ? 6 : dow - 1))
+  return padDate(d)
+}
+
+function formatDateLabel(dateStr: string, locale: string): string {
+  const [y, m, day] = dateStr.split('-')
+  return new Date(Number(y), Number(m) - 1, Number(day))
+    .toLocaleDateString(locale, { day: 'numeric', month: 'short' })
+}
+
+function formatMonthLabel(key: string, locale: string): string {
+  const [y, m] = key.split('-')
+  return new Date(Number(y), Number(m) - 1, 1)
+    .toLocaleDateString(locale, { month: 'short', year: '2-digit' })
+}
+
+// ── Chart data builder ────────────────────────────────────────────────────────
+
+function buildChartData(
+  raw: RawRes[],
+  range: Range,
+  startDateStr: string,
+  locale: string,
+): ChartPoint[] {
+  const filtered = raw.filter(r => r.data >= startDateStr && r.stato !== 'cancellata')
+
+  const todayDate = new Date()
+  todayDate.setHours(12, 0, 0, 0)
+  const todayStr = padDate(todayDate)
+
+  if (range === 1) {
+    // Daily: one bar per calendar day from period start → today
+    const map = new Map<string, number>()
+    const d = new Date(startDateStr + 'T12:00:00')
+    while (true) {
+      const key = padDate(d)
+      if (key > todayStr) break
+      map.set(key, 0)
+      d.setDate(d.getDate() + 1)
+    }
+    for (const r of filtered) {
+      if (r.data <= todayStr && map.has(r.data)) {
+        map.set(r.data, (map.get(r.data) ?? 0) + 1)
+      }
+    }
+    return Array.from(map.entries()).map(([key, count]) => ({
+      label: formatDateLabel(key, locale),
+      reservations: count,
+    }))
+  }
+
+  if (range === 3) {
+    // Weekly: one bar per ISO week (Mon–Sun). Weeks start on the Monday
+    // on or before the period start; iterate forward while Monday ≤ today.
+    const periodStart = new Date(startDateStr + 'T12:00:00')
+    const startDow = periodStart.getDay()
+    const firstMonday = new Date(periodStart)
+    firstMonday.setDate(firstMonday.getDate() - (startDow === 0 ? 6 : startDow - 1))
+    firstMonday.setHours(12, 0, 0, 0)
+
+    const map = new Map<string, number>()
+    const w = new Date(firstMonday)
+    while (padDate(w) <= todayStr) {
+      map.set(padDate(w), 0)
+      w.setDate(w.getDate() + 7)
+    }
+    for (const r of filtered) {
+      if (r.data <= todayStr) {
+        const monday = isoWeekMonday(r.data)
+        if (map.has(monday)) {
+          map.set(monday, (map.get(monday) ?? 0) + 1)
+        }
+      }
+    }
+    return Array.from(map.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, count]) => ({
+        label: formatDateLabel(key, locale),
+        reservations: count,
+      }))
+  }
+
+  // Monthly (range === 6): one bar per calendar month for the last 6 months
+  const now = new Date()
+  const map = new Map<string, number>()
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+    map.set(key, 0)
+  }
+  for (const r of filtered) {
+    const key = r.data.slice(0, 7)
+    if (map.has(key)) map.set(key, (map.get(key) ?? 0) + 1)
+  }
+  return Array.from(map.entries()).map(([key, count]) => ({
+    label: formatMonthLabel(key, locale),
+    reservations: count,
+  }))
+}
+
+// ── Stat helpers ──────────────────────────────────────────────────────────────
 
 function cancellationPct(cancelled: number, total: number): string {
   if (total === 0) return '—'
@@ -42,12 +150,16 @@ function computeDelta(
   return { label: '= 0%', color: 'text-ink-faint' }
 }
 
+// ── Component ─────────────────────────────────────────────────────────────────
+
 export default function StatsClient({
   buckets,
+  rawReservations,
   locale,
   dict,
 }: {
   buckets: MonthBucket[]
+  rawReservations: RawRes[]
   locale: string
   dict: StatsDict
 }) {
@@ -59,18 +171,21 @@ export default function StatsClient({
   const currentPeriod = buckets.slice(12 - range)
   const prevPeriod = buckets.slice(12 - 2 * range, 12 - range)
 
+  // Stat-card totals always derived from MonthBuckets (period-level, unchanged)
   const totalRes = currentPeriod.reduce((s, b) => s + b.reservations, 0)
   const totalCancelled = currentPeriod.reduce((s, b) => s + b.cancelled, 0)
   const totalCustomers = currentPeriod.reduce((s, b) => s + b.newCustomers, 0)
   const prevTotalRes = prevPeriod.reduce((s, b) => s + b.reservations, 0)
   const resDelta = computeDelta(totalRes, prevTotalRes)
 
-  const chartData = currentPeriod.map(b => ({
-    month: formatMonth(b.month, locale),
-    reservations: b.reservations,
-  }))
+  // Chart granularity is range-dependent; re-groups raw rows client-side
+  const startDateStr = buckets[12 - range].month + '-01'
+  const chartData = buildChartData(rawReservations, range, startDateStr, locale)
 
   const hasData = totalRes + totalCancelled > 0
+
+  // Reduce label density for high-bar-count views
+  const xInterval = range === 1 ? 4 : range === 3 ? 1 : 0
 
   const ranges: { value: Range; label: string }[] = [
     { value: 1, label: dict.lastMonth },
@@ -101,7 +216,6 @@ export default function StatsClient({
 
       {/* ── Stat cards ───────────────────────────────────────── */}
       <div className="grid grid-cols-3 gap-4 mb-8">
-        {/* Total reservations */}
         <div className="bg-surface rounded-xl border border-line p-5">
           <p className="text-xs text-ink-faint uppercase tracking-wide mb-3">
             {dict.totalReservations}
@@ -116,7 +230,6 @@ export default function StatsClient({
           )}
         </div>
 
-        {/* New customers */}
         <div className="bg-surface rounded-xl border border-line p-5">
           <p className="text-xs text-ink-faint uppercase tracking-wide mb-3">
             {dict.newCustomers}
@@ -124,7 +237,6 @@ export default function StatsClient({
           <p className="font-display font-medium text-4xl text-ink">{totalCustomers}</p>
         </div>
 
-        {/* Cancellation rate */}
         <div className="bg-surface rounded-xl border border-line p-5">
           <p className="text-xs text-ink-faint uppercase tracking-wide mb-3">
             {dict.cancellationRate}
@@ -154,7 +266,8 @@ export default function StatsClient({
             <BarChart data={chartData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--line)" vertical={false} />
               <XAxis
-                dataKey="month"
+                dataKey="label"
+                interval={xInterval}
                 tick={{ fontSize: 11, fill: 'var(--ink-faint)' }}
                 axisLine={false}
                 tickLine={false}

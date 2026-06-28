@@ -84,7 +84,12 @@ export default async function StatsPage() {
           {dict.stats.heading}
         </h1>
       </div>
-      <StatsClient buckets={buckets} locale={locale} dict={dict.stats} />
+      <StatsClient
+        buckets={buckets}
+        rawReservations={(reservations ?? []) as { data: string; stato: string }[]}
+        locale={locale}
+        dict={dict.stats}
+      />
     </div>
   )
 }
