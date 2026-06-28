@@ -2,8 +2,6 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
-const RESTAURANT_ID = 'fc1dc756-8e83-473d-9d6d-c32720e4d258'
-
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString('en-GB', {
     day: 'numeric',
@@ -21,10 +19,27 @@ export default async function CustomersPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  const { data: restaurant } = await supabase
+    .from('restaurants')
+    .select('id')
+    .eq('owner_id', user.id)
+    .single()
+
+  if (!restaurant) {
+    return (
+      <div className="min-h-screen p-8">
+        <Link href="/dashboard" className="text-sm text-gray-500 hover:text-black">
+          ← Dashboard
+        </Link>
+        <p className="text-red-600 text-sm mt-6">No restaurant found for this account.</p>
+      </div>
+    )
+  }
+
   const { data: customers, error } = await supabase
     .from('customers')
     .select('id, nome, telefono, visite, ultima_visita, note')
-    .eq('restaurant_id', RESTAURANT_ID)
+    .eq('restaurant_id', restaurant.id)
     .order('ultima_visita', { ascending: false })
 
   return (

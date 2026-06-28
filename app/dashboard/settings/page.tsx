@@ -4,8 +4,6 @@ import { createClient } from '@/lib/supabase/server'
 import SettingsForm from './SettingsForm'
 import type { RestaurantSettings } from './actions'
 
-const RESTAURANT_ID = 'fc1dc756-8e83-473d-9d6d-c32720e4d258'
-
 export default async function SettingsPage() {
   const supabase = await createClient()
   const {
@@ -13,23 +11,21 @@ export default async function SettingsPage() {
   } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from('restaurants')
     .select(
       'nome_ristorante, indirizzo, numero_twilio_from, capacita_totale, max_gruppo_singolo, orari_apertura, accessibilita, finestra_ore, numero_manager'
     )
-    .eq('id', RESTAURANT_ID)
+    .eq('owner_id', user.id)
     .single()
 
-  if (error || !data) {
+  if (!data) {
     return (
       <div className="min-h-screen p-8">
         <Link href="/dashboard" className="text-sm text-gray-500 hover:text-black">
           ← Dashboard
         </Link>
-        <p className="text-red-600 text-sm mt-6">
-          Failed to load settings: {error?.message}
-        </p>
+        <p className="text-red-600 text-sm mt-6">No restaurant found for this account.</p>
       </div>
     )
   }

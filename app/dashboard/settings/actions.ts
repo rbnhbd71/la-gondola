@@ -3,8 +3,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 
-const RESTAURANT_ID = 'fc1dc756-8e83-473d-9d6d-c32720e4d258'
-
 export interface RestaurantSettings {
   nome_ristorante: string
   indirizzo: string
@@ -26,10 +24,18 @@ export async function updateRestaurantSettings(
   } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  const { data: restaurant } = await supabase
+    .from('restaurants')
+    .select('id')
+    .eq('owner_id', user.id)
+    .single()
+
+  if (!restaurant) return { error: 'No restaurant found for this account.' }
+
   const { error } = await supabase
     .from('restaurants')
     .update(settings)
-    .eq('id', RESTAURANT_ID)
+    .eq('id', restaurant.id)
 
   if (error) return { error: error.message }
   return {}
