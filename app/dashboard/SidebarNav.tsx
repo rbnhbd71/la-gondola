@@ -10,6 +10,7 @@ export default function SidebarNav({ locale }: { locale: Locale }) {
   const links = [
     { href: '/dashboard', label: dict.nav.dashboard, exact: true },
     { href: '/dashboard/reservations', label: dict.nav.reservations, exact: false },
+    { href: '/dashboard/floor-plan', label: dict.nav.floorPlan, exact: false },
     { href: '/dashboard/customers', label: dict.nav.customers, exact: false },
     { href: '/dashboard/campaigns', label: dict.nav.campaigns, exact: false },
     { href: '/dashboard/settings', label: dict.nav.settings, exact: false },

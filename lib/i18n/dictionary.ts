@@ -4,6 +4,7 @@ export type Dictionary = {
   nav: {
     dashboard: string
     reservations: string
+    floorPlan: string
     customers: string
     campaigns: string
     settings: string
@@ -49,6 +50,10 @@ export type Dictionary = {
     saving: string
     edit: string
   }
+  floorPlan: {
+    heading: string
+    noTablesFound: string
+  }
   campaigns: {
     heading: string
     birthdayMessages: string
@@ -88,6 +93,7 @@ const en: Dictionary = {
   nav: {
     dashboard: 'Dashboard',
     reservations: 'Reservations',
+    floorPlan: 'Floor Plan',
     customers: 'Customers',
     campaigns: 'Campaigns',
     settings: 'Settings',
@@ -130,6 +136,10 @@ const en: Dictionary = {
     colNote: 'Note',
   },
   birthday: { saving: 'Saving…', edit: 'Edit' },
+  floorPlan: {
+    heading: 'Floor Plan',
+    noTablesFound: 'No tables configured yet.',
+  },
   campaigns: {
     heading: 'Campaigns',
     birthdayMessages: 'Birthday Messages',
@@ -170,6 +180,7 @@ const it: Dictionary = {
   nav: {
     dashboard: 'Dashboard',
     reservations: 'Prenotazioni',
+    floorPlan: 'Pianta Sala',
     customers: 'Clienti',
     campaigns: 'Campagne',
     settings: 'Impostazioni',
@@ -212,6 +223,10 @@ const it: Dictionary = {
     colNote: 'Note',
   },
   birthday: { saving: 'Salvataggio…', edit: 'Modifica' },
+  floorPlan: {
+    heading: 'Pianta Sala',
+    noTablesFound: 'Nessun tavolo configurato.',
+  },
   campaigns: {
     heading: 'Campagne',
     birthdayMessages: 'Messaggi di Compleanno',
@@ -252,6 +267,7 @@ const fr: Dictionary = {
   nav: {
     dashboard: 'Tableau de bord',
     reservations: 'Réservations',
+    floorPlan: 'Plan de Salle',
     customers: 'Clients',
     campaigns: 'Campagnes',
     settings: 'Paramètres',
@@ -294,6 +310,10 @@ const fr: Dictionary = {
     colNote: 'Note',
   },
   birthday: { saving: 'Enregistrement…', edit: 'Modifier' },
+  floorPlan: {
+    heading: 'Plan de Salle',
+    noTablesFound: 'Aucune table configurée.',
+  },
   campaigns: {
     heading: 'Campagnes',
     birthdayMessages: "Messages d'anniversaire",
@@ -334,6 +354,7 @@ const es: Dictionary = {
   nav: {
     dashboard: 'Panel',
     reservations: 'Reservas',
+    floorPlan: 'Plano de Sala',
     customers: 'Clientes',
     campaigns: 'Campañas',
     settings: 'Ajustes',
@@ -376,6 +397,10 @@ const es: Dictionary = {
     colNote: 'Note',
   },
   birthday: { saving: 'Guardando…', edit: 'Editar' },
+  floorPlan: {
+    heading: 'Plano de Sala',
+    noTablesFound: 'No hay mesas configuradas.',
+  },
   campaigns: {
     heading: 'Campañas',
     birthdayMessages: 'Mensajes de cumpleaños',
