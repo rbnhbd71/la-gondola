@@ -35,6 +35,8 @@ export type Dictionary = {
     colOspiti: string
     colStato: string
     statoCancellata: string
+    colTable: string
+    unassigned: string
   }
   customers: {
     heading: string
@@ -55,6 +57,11 @@ export type Dictionary = {
     noTablesFound: string
     addTable: string
     done: string
+    bookingView: string
+    editLayout: string
+    lunch: string
+    dinner: string
+    guests: string
   }
   campaigns: {
     heading: string
@@ -126,6 +133,8 @@ const en: Dictionary = {
     colOspiti: 'Ospiti',
     colStato: 'Stato',
     statoCancellata: 'Cancellata',
+    colTable: 'Table',
+    unassigned: 'Unassigned',
   },
   customers: {
     heading: 'Customers',
@@ -143,6 +152,11 @@ const en: Dictionary = {
     noTablesFound: 'No tables configured yet.',
     addTable: 'Add Table',
     done: 'Done',
+    bookingView: 'Booking View',
+    editLayout: 'Edit Layout',
+    lunch: 'Lunch',
+    dinner: 'Dinner',
+    guests: 'guests',
   },
   campaigns: {
     heading: 'Campaigns',
@@ -215,6 +229,8 @@ const it: Dictionary = {
     colOspiti: 'Ospiti',
     colStato: 'Stato',
     statoCancellata: 'Cancellata',
+    colTable: 'Tavolo',
+    unassigned: 'Non assegnato',
   },
   customers: {
     heading: 'Clienti',
@@ -232,6 +248,11 @@ const it: Dictionary = {
     noTablesFound: 'Nessun tavolo configurato.',
     addTable: 'Aggiungi tavolo',
     done: 'Fatto',
+    bookingView: 'Vista Prenotazioni',
+    editLayout: 'Modifica Pianta',
+    lunch: 'Pranzo',
+    dinner: 'Cena',
+    guests: 'ospiti',
   },
   campaigns: {
     heading: 'Campagne',
@@ -304,6 +325,8 @@ const fr: Dictionary = {
     colOspiti: 'Ospiti',
     colStato: 'Stato',
     statoCancellata: 'Cancellata',
+    colTable: 'Table',
+    unassigned: 'Non assignée',
   },
   customers: {
     heading: 'Clients',
@@ -321,6 +344,11 @@ const fr: Dictionary = {
     noTablesFound: 'Aucune table configurée.',
     addTable: 'Ajouter une table',
     done: 'Terminer',
+    bookingView: 'Vue Réservations',
+    editLayout: 'Modifier le Plan',
+    lunch: 'Déjeuner',
+    dinner: 'Dîner',
+    guests: 'couverts',
   },
   campaigns: {
     heading: 'Campagnes',
@@ -393,6 +421,8 @@ const es: Dictionary = {
     colOspiti: 'Ospiti',
     colStato: 'Stato',
     statoCancellata: 'Cancellata',
+    colTable: 'Mesa',
+    unassigned: 'Sin asignar',
   },
   customers: {
     heading: 'Clientes',
@@ -410,6 +440,11 @@ const es: Dictionary = {
     noTablesFound: 'No hay mesas configuradas.',
     addTable: 'Añadir mesa',
     done: 'Listo',
+    bookingView: 'Vista Reservas',
+    editLayout: 'Editar Plano',
+    lunch: 'Almuerzo',
+    dinner: 'Cena',
+    guests: 'comensales',
   },
   campaigns: {
     heading: 'Campañas',
