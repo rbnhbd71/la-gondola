@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 type Table = { id: string; label: string; capacity: number; x: number; y: number }
 type Reservation = { id: string; nome: string | null; ospiti: number; ora: string; table_id: string }
@@ -8,6 +9,15 @@ type Reservation = { id: string; nome: string | null; ospiti: number; ora: strin
 function todayISO() { return new Date().toISOString().split('T')[0] }
 function defaultService(): 'lunch' | 'dinner' { return new Date().getHours() < 16 ? 'lunch' : 'dinner' }
 function fmtTime(ora: string) { return ora.slice(0, 5) }
+
+function stepDate(current: string, delta: number): string {
+  const d = new Date(current + 'T12:00:00')
+  d.setDate(d.getDate() + delta)
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
 
 export default function BookingCanvas({
   tables,
@@ -58,12 +68,28 @@ export default function BookingCanvas({
   return (
     <div>
       <div className="flex flex-wrap items-center gap-3 mb-4">
-        <input
-          type="date"
-          value={date}
-          onChange={e => setDate(e.target.value)}
-          className="text-sm border border-line rounded-md px-3 py-2 bg-surface text-ink focus:outline-none focus:ring-2 focus:ring-line"
-        />
+        <div className="flex items-center border border-line rounded-md overflow-hidden">
+          <button
+            onClick={() => setDate(stepDate(date, -1))}
+            aria-label="Previous day"
+            className="px-2 py-2 text-ink-soft hover:bg-surface-sunk transition-colors border-r border-line"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <input
+            type="date"
+            value={date}
+            onChange={e => setDate(e.target.value)}
+            className="text-sm px-3 py-2 bg-surface text-ink focus:outline-none"
+          />
+          <button
+            onClick={() => setDate(stepDate(date, 1))}
+            aria-label="Next day"
+            className="px-2 py-2 text-ink-soft hover:bg-surface-sunk transition-colors border-l border-line"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
         <div className="flex rounded-md border border-line overflow-hidden">
           <button
             onClick={() => setService('lunch')}
