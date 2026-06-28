@@ -53,6 +53,8 @@ export type Dictionary = {
   floorPlan: {
     heading: string
     noTablesFound: string
+    addTable: string
+    done: string
   }
   campaigns: {
     heading: string
@@ -139,6 +141,8 @@ const en: Dictionary = {
   floorPlan: {
     heading: 'Floor Plan',
     noTablesFound: 'No tables configured yet.',
+    addTable: 'Add Table',
+    done: 'Done',
   },
   campaigns: {
     heading: 'Campaigns',
@@ -226,6 +230,8 @@ const it: Dictionary = {
   floorPlan: {
     heading: 'Pianta Sala',
     noTablesFound: 'Nessun tavolo configurato.',
+    addTable: 'Aggiungi tavolo',
+    done: 'Fatto',
   },
   campaigns: {
     heading: 'Campagne',
@@ -313,6 +319,8 @@ const fr: Dictionary = {
   floorPlan: {
     heading: 'Plan de Salle',
     noTablesFound: 'Aucune table configurée.',
+    addTable: 'Ajouter une table',
+    done: 'Terminer',
   },
   campaigns: {
     heading: 'Campagnes',
@@ -400,6 +408,8 @@ const es: Dictionary = {
   floorPlan: {
     heading: 'Plano de Sala',
     noTablesFound: 'No hay mesas configuradas.',
+    addTable: 'Añadir mesa',
+    done: 'Listo',
   },
   campaigns: {
     heading: 'Campañas',

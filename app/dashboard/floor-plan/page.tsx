@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getLocale } from '@/lib/i18n/getLocale'
 import { dictionary } from '@/lib/i18n/dictionary'
-import FloorCanvas from './FloorCanvas'
+import FloorEditor from './FloorEditor'
 
 export default async function FloorPlanPage() {
   const supabase = await createClient()
@@ -49,9 +49,15 @@ export default async function FloorPlanPage() {
         <p className="text-red-600 text-sm mb-4">{dict.common.errorPrefix} {error.message}</p>
       )}
 
-      <FloorCanvas
-        tables={tables ?? []}
-        noTablesFound={dict.floorPlan.noTablesFound}
+      <FloorEditor
+        initialTables={tables ?? []}
+        restaurantId={restaurant.id}
+        t={{
+          edit: dict.common.edit,
+          done: dict.floorPlan.done,
+          addTable: dict.floorPlan.addTable,
+          noTablesFound: dict.floorPlan.noTablesFound,
+        }}
       />
     </div>
   )
