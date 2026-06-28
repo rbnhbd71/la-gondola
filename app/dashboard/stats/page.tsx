@@ -39,7 +39,7 @@ export default async function StatsPage() {
   const [{ data: reservations }, { data: customers }] = await Promise.all([
     supabase
       .from('reservations')
-      .select('data, stato')
+      .select('data, stato, ora')
       .eq('restaurant_id', restaurant.id)
       .gte('data', startDateStr),
     supabase
@@ -86,9 +86,11 @@ export default async function StatsPage() {
       </div>
       <StatsClient
         buckets={buckets}
-        rawReservations={(reservations ?? []) as { data: string; stato: string }[]}
+        rawReservations={(reservations ?? []) as { data: string; stato: string; ora: string }[]}
         locale={locale}
         dict={dict.stats}
+        lunchLabel={dict.floorPlan.lunch}
+        dinnerLabel={dict.floorPlan.dinner}
       />
     </div>
   )
