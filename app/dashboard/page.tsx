@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
@@ -19,7 +20,12 @@ export default async function DashboardPage() {
   return (
     <div className="min-h-screen p-8">
       <p className="text-lg">Welcome, {user.email}</p>
-      <form action={signOut} className="mt-4">
+      <nav className="mt-6 flex flex-col gap-2">
+        <Link href="/dashboard/reservations" className="text-sm text-blue-600 hover:underline">
+          Reservations →
+        </Link>
+      </nav>
+      <form action={signOut} className="mt-8">
         <button
           type="submit"
           className="text-sm text-gray-600 underline hover:text-black"
