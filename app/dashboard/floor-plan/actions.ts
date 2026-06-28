@@ -8,13 +8,21 @@ export async function addTable(restaurantId: string): Promise<{ data?: TableRow;
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized' }
 
-  const { count } = await supabase
+  const { data: existing } = await supabase
     .from('tables')
-    .select('*', { count: 'exact', head: true })
+    .select('label, x, y')
     .eq('restaurant_id', restaurantId)
 
-  const n = count ?? 0
-  const label = `Table ${n + 1}`
+  const rows = existing ?? []
+
+  const tableNumRe = /^Table (\d+)$/
+  const maxNum = rows.reduce((max, t) => {
+    const m = t.label.match(tableNumRe)
+    return m ? Math.max(max, parseInt(m[1], 10)) : max
+  }, 0)
+
+  const label = `Table ${maxNum + 1}`
+  const n = rows.length
   const x = 50 + (n % 5) * 110
   const y = 50 + Math.floor(n / 5) * 110
 
