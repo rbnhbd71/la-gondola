@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import BirthdayCell from './BirthdayCell'
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString('en-GB', {
@@ -38,12 +39,12 @@ export default async function CustomersPage() {
 
   const { data: customers, error } = await supabase
     .from('customers')
-    .select('id, nome, telefono, visite, ultima_visita, note')
+    .select('id, nome, telefono, visite, ultima_visita, note, compleanno')
     .eq('restaurant_id', restaurant.id)
     .order('ultima_visita', { ascending: false })
 
   return (
-    <div className="min-h-screen p-8 max-w-4xl">
+    <div className="min-h-screen p-8 max-w-5xl">
       <div className="mb-6">
         <Link href="/dashboard" className="text-sm text-gray-500 hover:text-black">
           ← Dashboard
@@ -68,6 +69,7 @@ export default async function CustomersPage() {
                 <th className="pb-3 pr-8">Telefono</th>
                 <th className="pb-3 pr-8">Visite</th>
                 <th className="pb-3 pr-8">Ultima Visita</th>
+                <th className="pb-3 pr-8">Compleanno</th>
                 <th className="pb-3">Note</th>
               </tr>
             </thead>
@@ -78,6 +80,9 @@ export default async function CustomersPage() {
                   <td className="py-3 pr-8 text-gray-500">{formatPhone(c.telefono)}</td>
                   <td className="py-3 pr-8">{c.visite}</td>
                   <td className="py-3 pr-8">{c.ultima_visita ? formatDate(c.ultima_visita) : '—'}</td>
+                  <td className="py-3 pr-8">
+                    <BirthdayCell customerId={c.id} initial={c.compleanno ?? null} />
+                  </td>
                   <td className="py-3 text-gray-500">{c.note ?? '—'}</td>
                 </tr>
               ))}
