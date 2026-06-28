@@ -7,6 +7,7 @@ export type Dictionary = {
     floorPlan: string
     customers: string
     campaigns: string
+    stats: string
     settings: string
     logOut: string
   }
@@ -112,6 +113,18 @@ export type Dictionary = {
     signIn: string
     signingIn: string
   }
+  stats: {
+    heading: string
+    lastMonth: string
+    last3Months: string
+    last6Months: string
+    totalReservations: string
+    newCustomers: string
+    cancellationRate: string
+    chartHeading: string
+    vsPrevPeriod: string
+    noDataYet: string
+  }
 }
 
 const en: Dictionary = {
@@ -121,6 +134,7 @@ const en: Dictionary = {
     floorPlan: 'Floor Plan',
     customers: 'Customers',
     campaigns: 'Campaigns',
+    stats: 'Statistics',
     settings: 'Settings',
     logOut: 'Log out',
   },
@@ -224,6 +238,18 @@ const en: Dictionary = {
     signIn: 'Sign in',
     signingIn: 'Signing in…',
   },
+  stats: {
+    heading: 'Statistics',
+    lastMonth: 'Last month',
+    last3Months: 'Last 3 months',
+    last6Months: 'Last 6 months',
+    totalReservations: 'Total reservations',
+    newCustomers: 'New customers',
+    cancellationRate: 'Cancellation rate',
+    chartHeading: 'Reservations over time',
+    vsPrevPeriod: 'vs previous period',
+    noDataYet: 'No data for this period yet.',
+  },
 }
 
 const it: Dictionary = {
@@ -233,6 +259,7 @@ const it: Dictionary = {
     floorPlan: 'Pianta Sala',
     customers: 'Clienti',
     campaigns: 'Campagne',
+    stats: 'Statistiche',
     settings: 'Impostazioni',
     logOut: 'Esci',
   },
@@ -336,6 +363,18 @@ const it: Dictionary = {
     signIn: 'Accedi',
     signingIn: 'Accesso in corso…',
   },
+  stats: {
+    heading: 'Statistiche',
+    lastMonth: 'Ultimo mese',
+    last3Months: 'Ultimi 3 mesi',
+    last6Months: 'Ultimi 6 mesi',
+    totalReservations: 'Prenotazioni totali',
+    newCustomers: 'Nuovi clienti',
+    cancellationRate: 'Tasso di cancellazione',
+    chartHeading: 'Prenotazioni nel tempo',
+    vsPrevPeriod: 'vs periodo precedente',
+    noDataYet: 'Nessun dato per questo periodo.',
+  },
 }
 
 const fr: Dictionary = {
@@ -345,6 +384,7 @@ const fr: Dictionary = {
     floorPlan: 'Plan de Salle',
     customers: 'Clients',
     campaigns: 'Campagnes',
+    stats: 'Statistiques',
     settings: 'Paramètres',
     logOut: 'Déconnexion',
   },
@@ -448,6 +488,18 @@ const fr: Dictionary = {
     signIn: 'Se connecter',
     signingIn: 'Connexion…',
   },
+  stats: {
+    heading: 'Statistiques',
+    lastMonth: 'Le mois dernier',
+    last3Months: '3 derniers mois',
+    last6Months: '6 derniers mois',
+    totalReservations: 'Réservations totales',
+    newCustomers: 'Nouveaux clients',
+    cancellationRate: "Taux d'annulation",
+    chartHeading: 'Réservations dans le temps',
+    vsPrevPeriod: 'vs période précédente',
+    noDataYet: 'Pas encore de données pour cette période.',
+  },
 }
 
 const es: Dictionary = {
@@ -457,6 +509,7 @@ const es: Dictionary = {
     floorPlan: 'Plano de Sala',
     customers: 'Clientes',
     campaigns: 'Campañas',
+    stats: 'Estadísticas',
     settings: 'Ajustes',
     logOut: 'Cerrar sesión',
   },
@@ -559,6 +612,18 @@ const es: Dictionary = {
     passwordLabel: 'Contraseña',
     signIn: 'Iniciar sesión',
     signingIn: 'Iniciando sesión…',
+  },
+  stats: {
+    heading: 'Estadísticas',
+    lastMonth: 'Último mes',
+    last3Months: 'Últimos 3 meses',
+    last6Months: 'Últimos 6 meses',
+    totalReservations: 'Reservas totales',
+    newCustomers: 'Nuevos clientes',
+    cancellationRate: 'Tasa de cancelación',
+    chartHeading: 'Reservas a lo largo del tiempo',
+    vsPrevPeriod: 'vs período anterior',
+    noDataYet: 'Sin datos para este período todavía.',
   },
 }
 

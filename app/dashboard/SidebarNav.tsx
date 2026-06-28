@@ -13,6 +13,7 @@ export default function SidebarNav({ locale }: { locale: Locale }) {
     { href: '/dashboard/floor-plan', label: dict.nav.floorPlan, exact: false },
     { href: '/dashboard/customers', label: dict.nav.customers, exact: false },
     { href: '/dashboard/campaigns', label: dict.nav.campaigns, exact: false },
+    { href: '/dashboard/stats', label: dict.nav.stats, exact: false },
     { href: '/dashboard/settings', label: dict.nav.settings, exact: false },
   ]
 
