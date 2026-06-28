@@ -37,3 +37,13 @@ export async function deleteTable(tableId: string): Promise<{ error?: string }> 
   if (error) return { error: error.message }
   return {}
 }
+
+export async function updateTablePosition(tableId: string, x: number, y: number): Promise<{ error?: string }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Unauthorized' }
+
+  const { error } = await supabase.from('tables').update({ x, y }).eq('id', tableId)
+  if (error) return { error: error.message }
+  return {}
+}

@@ -1,6 +1,6 @@
 'use client'
 import { useState, useTransition } from 'react'
-import { addTable, deleteTable } from './actions'
+import { addTable, deleteTable, updateTablePosition } from './actions'
 import FloorCanvas from './FloorCanvas'
 
 type Table = { id: string; label: string; capacity: number; x: number; y: number }
@@ -32,6 +32,15 @@ export default function FloorEditor({
     })
   }
 
+  function handleDragEnd(id: string, delta: { x: number; y: number }) {
+    const table = tables.find(t => t.id === id)
+    if (!table) return
+    const newX = Math.max(0, table.x + delta.x)
+    const newY = Math.max(0, table.y + delta.y)
+    setTables(prev => prev.map(t => t.id === id ? { ...t, x: newX, y: newY } : t))
+    startTransition(async () => { await updateTablePosition(id, newX, newY) })
+  }
+
   return (
     <div>
       <div className="flex items-center gap-3 mb-4">
@@ -59,6 +68,7 @@ export default function FloorEditor({
         tables={tables}
         editMode={editMode}
         onDelete={handleDelete}
+        onDragEnd={handleDragEnd}
         noTablesFound={t.noTablesFound}
       />
     </div>
