@@ -15,6 +15,25 @@ type FormFields = {
   numero_manager: string
 }
 
+export type SettingsFormDict = {
+  edit: string
+  save: string
+  saving: string
+  cancel: string
+  savedSuccessfully: string
+  confirmSave: string
+  mustBePositiveInt: string
+  labelNomeRistorante: string
+  labelIndirizzo: string
+  labelNumeroTwilioFrom: string
+  labelNumeroManager: string
+  labelOrariApertura: string
+  labelAccessibilita: string
+  labelCapacitaTotale: string
+  labelMaxGruppoSingolo: string
+  labelFinestraOre: string
+}
+
 function toForm(s: RestaurantSettings): FormFields {
   return {
     ...s,
@@ -29,11 +48,17 @@ function isPositiveInt(v: string): boolean {
   return Number.isInteger(n) && n > 0
 }
 
-const input = 'block w-full text-sm border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black'
-const readOnly = 'block w-full text-sm text-gray-900 py-2'
-const label = 'block text-xs font-medium text-gray-500 mb-1'
+const inputCls = 'block w-full text-sm border border-line rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-line'
+const readOnlyCls = 'block w-full text-sm text-ink py-2'
+const labelCls = 'block text-xs font-normal text-stone-400 uppercase tracking-wide mb-1'
 
-export default function SettingsForm({ initial }: { initial: RestaurantSettings }) {
+export default function SettingsForm({
+  initial,
+  t,
+}: {
+  initial: RestaurantSettings
+  t: SettingsFormDict
+}) {
   const [editing, setEditing] = useState(false)
   const [fields, setFields] = useState<FormFields>(toForm(initial))
   const [committed, setCommitted] = useState<FormFields>(toForm(initial))
@@ -42,9 +67,9 @@ export default function SettingsForm({ initial }: { initial: RestaurantSettings 
   const [isPending, startTransition] = useTransition()
 
   const numericErrors: Record<'capacita_totale' | 'max_gruppo_singolo' | 'finestra_ore', string | null> = {
-    capacita_totale: isPositiveInt(fields.capacita_totale) ? null : 'Must be a positive whole number',
-    max_gruppo_singolo: isPositiveInt(fields.max_gruppo_singolo) ? null : 'Must be a positive whole number',
-    finestra_ore: isPositiveInt(fields.finestra_ore) ? null : 'Must be a positive whole number',
+    capacita_totale: isPositiveInt(fields.capacita_totale) ? null : t.mustBePositiveInt,
+    max_gruppo_singolo: isPositiveInt(fields.max_gruppo_singolo) ? null : t.mustBePositiveInt,
+    finestra_ore: isPositiveInt(fields.finestra_ore) ? null : t.mustBePositiveInt,
   }
   const hasErrors = Object.values(numericErrors).some(Boolean)
 
@@ -53,24 +78,12 @@ export default function SettingsForm({ initial }: { initial: RestaurantSettings 
     setSuccess(false)
   }
 
-  function handleEdit() {
-    setEditing(true)
-    setSuccess(false)
-    setError(null)
-  }
-
-  function handleCancel() {
-    setFields(committed)
-    setEditing(false)
-    setError(null)
-  }
+  function handleEdit() { setEditing(true); setSuccess(false); setError(null) }
+  function handleCancel() { setFields(committed); setEditing(false); setError(null) }
 
   function handleSave() {
     if (hasErrors) return
-    const confirmed = window.confirm(
-      'This will update the live restaurant settings used by the WhatsApp bot. Continue?'
-    )
-    if (!confirmed) return
+    if (!window.confirm(t.confirmSave)) return
     startTransition(async () => {
       setError(null)
       const result = await updateRestaurantSettings({
@@ -95,21 +108,21 @@ export default function SettingsForm({ initial }: { initial: RestaurantSettings 
   }
 
   const textFields: { key: keyof FormFields; label: string }[] = [
-    { key: 'nome_ristorante', label: 'Nome Ristorante' },
-    { key: 'indirizzo', label: 'Indirizzo' },
-    { key: 'numero_twilio_from', label: 'Numero Twilio (From)' },
-    { key: 'numero_manager', label: 'Numero Manager' },
+    { key: 'nome_ristorante', label: t.labelNomeRistorante },
+    { key: 'indirizzo', label: t.labelIndirizzo },
+    { key: 'numero_twilio_from', label: t.labelNumeroTwilioFrom },
+    { key: 'numero_manager', label: t.labelNumeroManager },
   ]
 
   const textareaFields: { key: keyof FormFields; label: string }[] = [
-    { key: 'orari_apertura', label: 'Orari Apertura' },
-    { key: 'accessibilita', label: 'Accessibilità' },
+    { key: 'orari_apertura', label: t.labelOrariApertura },
+    { key: 'accessibilita', label: t.labelAccessibilita },
   ]
 
   const numericFields: { key: 'capacita_totale' | 'max_gruppo_singolo' | 'finestra_ore'; label: string }[] = [
-    { key: 'capacita_totale', label: 'Capacità Totale' },
-    { key: 'max_gruppo_singolo', label: 'Max Gruppo Singolo' },
-    { key: 'finestra_ore', label: 'Finestra Ore' },
+    { key: 'capacita_totale', label: t.labelCapacitaTotale },
+    { key: 'max_gruppo_singolo', label: t.labelMaxGruppoSingolo },
+    { key: 'finestra_ore', label: t.labelFinestraOre },
   ]
 
   return (
@@ -118,73 +131,69 @@ export default function SettingsForm({ initial }: { initial: RestaurantSettings 
         {!editing ? (
           <button
             onClick={handleEdit}
-            className="text-sm px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800"
+            className="text-sm px-4 py-2 bg-wine text-white rounded-md hover:bg-wine/90"
           >
-            Edit
+            {t.edit}
           </button>
         ) : (
           <>
             <button
               onClick={handleSave}
               disabled={isPending || hasErrors}
-              className="text-sm px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 disabled:opacity-50"
+              className="text-sm px-4 py-2 bg-wine text-white rounded-md hover:bg-wine/90 disabled:opacity-50"
             >
-              {isPending ? 'Saving…' : 'Save'}
+              {isPending ? t.saving : t.save}
             </button>
             <button
               onClick={handleCancel}
               disabled={isPending}
-              className="text-sm px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+              className="text-sm px-4 py-2 border border-line rounded-md hover:bg-[#F0EBE1] disabled:opacity-50"
             >
-              Cancel
+              {t.cancel}
             </button>
           </>
         )}
       </div>
 
-      {success && (
-        <p className="text-green-700 text-sm mb-6">Settings saved successfully.</p>
-      )}
-      {error && (
-        <p className="text-red-600 text-sm mb-6">Error: {error}</p>
-      )}
+      {success && <p className="text-sage text-sm mb-6">{t.savedSuccessfully}</p>}
+      {error && <p className="text-red-600 text-sm mb-6">Error: {error}</p>}
 
       <div className="grid grid-cols-1 gap-6 max-w-lg">
         {textFields.map(({ key, label: fieldLabel }) => (
           <div key={key}>
-            <label className={label}>{fieldLabel}</label>
+            <label className={labelCls}>{fieldLabel}</label>
             {editing ? (
               <input
                 type="text"
                 value={fields[key]}
                 onChange={(e) => set(key, e.target.value)}
-                className={input}
+                className={inputCls}
               />
             ) : (
-              <p className={readOnly}>{committed[key]}</p>
+              <p className={readOnlyCls}>{committed[key]}</p>
             )}
           </div>
         ))}
 
         {textareaFields.map(({ key, label: fieldLabel }) => (
           <div key={key}>
-            <label className={label}>{fieldLabel}</label>
+            <label className={labelCls}>{fieldLabel}</label>
             {editing ? (
               <textarea
                 rows={3}
                 value={fields[key]}
                 onChange={(e) => set(key, e.target.value)}
-                className={input}
+                className={inputCls}
               />
             ) : (
-              <p className={`${readOnly} whitespace-pre-wrap`}>{committed[key]}</p>
+              <p className={`${readOnlyCls} whitespace-pre-wrap`}>{committed[key]}</p>
             )}
           </div>
         ))}
 
         {numericFields.map(({ key, label: fieldLabel }) => (
           <div key={key}>
-            <label className={label}>{fieldLabel}</label>
+            <label className={labelCls}>{fieldLabel}</label>
             {editing ? (
               <>
                 <input
@@ -193,14 +202,14 @@ export default function SettingsForm({ initial }: { initial: RestaurantSettings 
                   step="1"
                   value={fields[key]}
                   onChange={(e) => set(key, e.target.value)}
-                  className={input}
+                  className={inputCls}
                 />
                 {numericErrors[key] && (
                   <p className="text-red-600 text-xs mt-1">{numericErrors[key]}</p>
                 )}
               </>
             ) : (
-              <p className={readOnly}>{committed[key]}</p>
+              <p className={readOnlyCls}>{committed[key]}</p>
             )}
           </div>
         ))}

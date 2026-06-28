@@ -15,9 +15,13 @@ function formatDate(dateStr: string | null) {
 export default function BirthdayCell({
   customerId,
   initial,
+  tEdit,
+  tSaving,
 }: {
   customerId: string
   initial: string | null
+  tEdit: string
+  tSaving: string
 }) {
   const [editing, setEditing] = useState(false)
   const [value, setValue] = useState(initial ?? '')
@@ -56,9 +60,9 @@ export default function BirthdayCell({
           onBlur={handleBlur}
           autoFocus
           disabled={isPending}
-          className="text-xs border border-gray-300 rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-black disabled:opacity-50"
+          className="text-xs border border-line rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-line disabled:opacity-50"
         />
-        {isPending && <span className="text-xs text-gray-400">Saving…</span>}
+        {isPending && <span className="text-xs text-stone-400">{tSaving}</span>}
       </div>
     )
   }
@@ -72,9 +76,9 @@ export default function BirthdayCell({
       )}
       <button
         onClick={() => { setEditing(true); setStatus('idle') }}
-        className="text-xs text-gray-400 hover:text-black"
+        className="text-xs text-stone-400 hover:text-ink"
       >
-        Edit
+        {tEdit}
       </button>
     </div>
   )

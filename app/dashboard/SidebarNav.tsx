@@ -1,30 +1,32 @@
 'use client'
-
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { dictionary, type Locale } from '@/lib/i18n/dictionary'
 
-const links = [
-  { href: '/dashboard', label: 'Dashboard', exact: true },
-  { href: '/dashboard/reservations', label: 'Reservations', exact: false },
-  { href: '/dashboard/customers', label: 'Customers', exact: false },
-  { href: '/dashboard/settings', label: 'Settings', exact: false },
-]
-
-export default function SidebarNav() {
+export default function SidebarNav({ locale }: { locale: Locale }) {
   const pathname = usePathname()
+  const dict = dictionary[locale]
+
+  const links = [
+    { href: '/dashboard', label: dict.nav.dashboard, exact: true },
+    { href: '/dashboard/reservations', label: dict.nav.reservations, exact: false },
+    { href: '/dashboard/customers', label: dict.nav.customers, exact: false },
+    { href: '/dashboard/campaigns', label: dict.nav.campaigns, exact: false },
+    { href: '/dashboard/settings', label: dict.nav.settings, exact: false },
+  ]
 
   return (
-    <nav className="flex flex-col gap-1 p-3">
+    <nav className="flex flex-col py-3">
       {links.map(({ href, label, exact }) => {
         const active = exact ? pathname === href : pathname.startsWith(href)
         return (
           <Link
             key={href}
             href={href}
-            className={`text-sm rounded-md px-3 py-2 transition-colors ${
+            className={`text-sm py-2 px-5 border-l-2 transition-colors ${
               active
-                ? 'bg-gray-200 text-gray-900 font-medium'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                ? 'border-gold text-ink font-medium'
+                : 'border-transparent text-stone-400 hover:text-ink'
             }`}
           >
             {label}

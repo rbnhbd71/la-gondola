@@ -1,5 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getLocale } from '@/lib/i18n/getLocale'
+import { dictionary } from '@/lib/i18n/dictionary'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -7,6 +9,9 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) redirect('/login')
+
+  const locale = await getLocale()
+  const dict = dictionary[locale]
 
   const { data: restaurant } = await supabase
     .from('restaurants')
@@ -16,8 +21,8 @@ export default async function DashboardPage() {
 
   if (!restaurant) {
     return (
-      <div className="p-8">
-        <p className="text-red-600 text-sm">No restaurant found for this account.</p>
+      <div className="p-10">
+        <p className="text-red-600 text-sm">{dict.common.noRestaurantFound}</p>
       </div>
     )
   }
@@ -46,19 +51,19 @@ export default async function DashboardPage() {
   ])
 
   const stats = [
-    { label: "Today's reservations", value: todayResult.count },
-    { label: 'Next 7 days', value: weekResult.count },
-    { label: 'Total customers', value: customerResult.count },
+    { label: dict.dashboard.todaysReservations, value: todayResult.count },
+    { label: dict.dashboard.next7Days, value: weekResult.count },
+    { label: dict.dashboard.totalCustomers, value: customerResult.count },
   ]
 
   return (
-    <div className="p-8 max-w-2xl">
-      <h1 className="text-2xl font-semibold mb-8">Overview</h1>
-      <div className="grid grid-cols-3 gap-4">
+    <div className="p-10">
+      <h1 className="font-display font-medium text-3xl text-ink mb-8">{dict.dashboard.heading}</h1>
+      <div className="grid grid-cols-3 gap-3">
         {stats.map(({ label, value }) => (
-          <div key={label} className="border border-gray-200 rounded-lg p-4">
-            <p className="text-3xl font-semibold">{value ?? '—'}</p>
-            <p className="text-sm text-gray-500 mt-1">{label}</p>
+          <div key={label} className="bg-[#F0EBE1] rounded-xl p-5">
+            <p className="font-display font-medium text-4xl text-wine">{value ?? '—'}</p>
+            <p className="text-sm text-stone-500 mt-1">{label}</p>
           </div>
         ))}
       </div>

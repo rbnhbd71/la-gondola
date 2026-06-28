@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(**)",
+      "Write(/Users/rubenhubschmid/Documents/la-gondola/la-gondola-dashboard/**)",
+      "Edit(/Users/rubenhubschmid/Documents/la-gondola/la-gondola-dashboard/**)",
+      "Bash(ls*)",
+      "Bash(cat *)",
+      "Bash(grep *)",
+      "Bash(find *)",
+      "Bash(pwd)",
+      "Bash(npx tsc --noEmit*)",
+      "Bash(npm run dev*)",
+      "Bash(npm run build*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)"
+    ],
+    "deny": [
+      "Bash(rm *)",
+      "Bash(kill *)",
+      "Write(/Users/rubenhubschmid/Documents/la-gondola/la-gondola-dashboard/.env*)"
+    ]
+  }
+}

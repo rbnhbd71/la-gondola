@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getLocale } from '@/lib/i18n/getLocale'
+import { dictionary } from '@/lib/i18n/dictionary'
 
 function formatDate(dateStr: string) {
   return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-GB', {
@@ -19,6 +21,9 @@ export default async function ReservationsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  const locale = await getLocale()
+  const dict = dictionary[locale]
+
   const { data: restaurant } = await supabase
     .from('restaurants')
     .select('id')
@@ -27,11 +32,11 @@ export default async function ReservationsPage() {
 
   if (!restaurant) {
     return (
-      <div className="min-h-screen p-8">
-        <Link href="/dashboard" className="text-sm text-gray-500 hover:text-black">
-          ← Dashboard
+      <div className="p-10">
+        <Link href="/dashboard" className="text-sm text-stone-400 hover:text-ink">
+          {dict.common.backToDashboard}
         </Link>
-        <p className="text-red-600 text-sm mt-6">No restaurant found for this account.</p>
+        <p className="text-red-600 text-sm mt-6">{dict.common.noRestaurantFound}</p>
       </div>
     )
   }
@@ -44,32 +49,32 @@ export default async function ReservationsPage() {
     .order('ora', { ascending: true })
 
   return (
-    <div className="min-h-screen p-8 max-w-4xl">
-      <div className="mb-6">
-        <Link href="/dashboard" className="text-sm text-gray-500 hover:text-black">
-          ← Dashboard
+    <div className="p-10 max-w-4xl">
+      <div className="mb-8">
+        <Link href="/dashboard" className="text-sm text-stone-400 hover:text-ink">
+          {dict.common.backToDashboard}
         </Link>
-        <h1 className="text-2xl font-semibold mt-2">Reservations</h1>
+        <h1 className="font-display font-medium text-3xl text-ink mt-2">{dict.reservations.heading}</h1>
       </div>
 
       {error && (
-        <p className="text-red-600 text-sm">Error: {error.message}</p>
+        <p className="text-red-600 text-sm">{dict.common.errorPrefix} {error.message}</p>
       )}
 
       {!error && reservations?.length === 0 && (
-        <p className="text-gray-500 text-sm">No reservations found.</p>
+        <p className="text-stone-500 text-sm">{dict.reservations.noReservationsFound}</p>
       )}
 
       {!error && reservations && reservations.length > 0 && (
         <div className="overflow-x-auto">
           <table className="w-full text-sm border-collapse">
             <thead>
-              <tr className="border-b border-gray-200 text-left text-gray-500 font-medium">
-                <th className="pb-3 pr-8">Nome</th>
-                <th className="pb-3 pr-8">Data</th>
-                <th className="pb-3 pr-8">Ora</th>
-                <th className="pb-3 pr-8">Ospiti</th>
-                <th className="pb-3">Stato</th>
+              <tr className="border-b border-line text-left">
+                <th className="pb-3 pr-8 text-xs font-normal uppercase tracking-wide text-stone-400">{dict.reservations.colNome}</th>
+                <th className="pb-3 pr-8 text-xs font-normal uppercase tracking-wide text-stone-400">{dict.reservations.colData}</th>
+                <th className="pb-3 pr-8 text-xs font-normal uppercase tracking-wide text-stone-400">{dict.reservations.colOra}</th>
+                <th className="pb-3 pr-8 text-xs font-normal uppercase tracking-wide text-stone-400">{dict.reservations.colOspiti}</th>
+                <th className="pb-3 text-xs font-normal uppercase tracking-wide text-stone-400">{dict.reservations.colStato}</th>
               </tr>
             </thead>
             <tbody>
@@ -78,19 +83,19 @@ export default async function ReservationsPage() {
                 return (
                   <tr
                     key={r.id}
-                    className={`border-b border-gray-100 ${cancelled ? 'opacity-40' : ''}`}
+                    className={`border-b border-line ${cancelled ? 'opacity-40' : ''}`}
                   >
-                    <td className="py-3 pr-8">{r.nome}</td>
-                    <td className="py-3 pr-8">{formatDate(r.data)}</td>
-                    <td className="py-3 pr-8">{formatTime(r.ora)}</td>
-                    <td className="py-3 pr-8">{r.ospiti}</td>
+                    <td className="py-3 pr-8 text-ink">{r.nome}</td>
+                    <td className="py-3 pr-8 text-ink">{formatDate(r.data)}</td>
+                    <td className="py-3 pr-8 text-ink">{formatTime(r.ora)}</td>
+                    <td className="py-3 pr-8 text-ink">{r.ospiti}</td>
                     <td className="py-3">
                       {cancelled ? (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
-                          Cancellata
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-[#E8E4DE] text-stone-400">
+                          {dict.reservations.statoCancellata}
                         </span>
                       ) : (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-green-50 text-green-700">
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-[#E6EDE4] text-sage">
                           {r.stato}
                         </span>
                       )}
