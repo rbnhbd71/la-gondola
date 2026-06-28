@@ -30,12 +30,12 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-full max-w-sm bg-white rounded-lg shadow p-8">
-        <h1 className="text-2xl font-semibold mb-6 text-gray-900">Sign in</h1>
+    <div className="min-h-screen flex items-center justify-center bg-bg">
+      <div className="w-full max-w-sm bg-surface rounded-xl border border-line shadow-sm p-8">
+        <h1 className="font-display font-medium text-2xl text-ink mb-6">Sign in</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs font-normal text-ink-faint uppercase tracking-wide mb-1">
               Email
             </label>
             <input
@@ -44,11 +44,11 @@ export default function LoginPage() {
               onChange={e => setEmail(e.target.value)}
               required
               autoComplete="email"
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+              className="w-full border border-line rounded-md px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-line"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs font-normal text-ink-faint uppercase tracking-wide mb-1">
               Password
             </label>
             <input
@@ -57,14 +57,14 @@ export default function LoginPage() {
               onChange={e => setPassword(e.target.value)}
               required
               autoComplete="current-password"
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+              className="w-full border border-line rounded-md px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-line"
             />
           </div>
           {error && <p className="text-red-600 text-sm">{error}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-black text-white py-2 rounded-md text-sm font-medium hover:bg-gray-800 disabled:opacity-50 transition-colors"
+            className="w-full bg-clay text-white py-2 rounded-md text-sm font-medium hover:bg-clay-dark disabled:opacity-50 transition-colors"
           >
             {loading ? 'Signing in…' : 'Sign in'}
           </button>
