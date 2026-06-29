@@ -1,6 +1,6 @@
 # La Gondola Dashboard — Handoff Summary
 
-> Last updated: 2026-06-28 (tiers session)  
+> Last updated: 2026-06-28 (reliability + escalation session)  
 > Author: Claude Code (Sonnet 4.6)  
 > Repo: https://github.com/rbnhbd71/la-gondola
 
@@ -282,7 +282,9 @@ This pattern was used for all schema migrations (0001–0003) and for seeding te
 
 ## 9. Seed / Test Data
 
-120 fake reservation rows were inserted on 2026-06-28 for testing the Statistics page charts. They are identifiable by `nome` values from this list:
+~~120 fake reservation rows were inserted on 2026-06-28 for testing the Statistics page charts.~~ **Deleted and verified on 2026-06-28.** All 120 rows have been removed; a post-delete count query confirmed 0 rows remain matching those names. No other reservation rows were affected.
+
+The rows were identifiable by `nome` values from this list (for reference only — no longer present):
 
 ```
 Marco Bianchi, Giulia Rossi, Luca Ferrari, Sofia Esposito, Alessandro Romano,
@@ -291,19 +293,7 @@ Davide Bruno, Elena Greco, Simone Mancini, Martina Barbieri, Federico Fontana,
 Laura De Luca, Riccardo Marini, Alice Gallo, Stefano Vitale, Monica Caruso
 ```
 
-To remove all seed data:
-```sql
-DELETE FROM reservations
-WHERE restaurant_id = 'fc1dc756-8e83-473d-9d6d-c32720e4d258'
-  AND nome IN (
-    'Marco Bianchi','Giulia Rossi','Luca Ferrari','Sofia Esposito','Alessandro Romano',
-    'Francesca Ricci','Matteo Lombardi','Valentina Conti','Lorenzo Moretti','Chiara Costa',
-    'Davide Bruno','Elena Greco','Simone Mancini','Martina Barbieri','Federico Fontana',
-    'Laura De Luca','Riccardo Marini','Alice Gallo','Stefano Vitale','Monica Caruso'
-  );
-```
-
-**The `customers` table is clean** — seed rows only exist in `reservations`. There are no DB triggers on `reservations`, so no customer rows were auto-created. The dashboard's "new customers" and "top customers" stats are unaffected.
+**The `customers` table was clean and remains clean** — seed rows only existed in `reservations`. No customer rows were auto-created (no DB triggers on `reservations`). The dashboard's "new customers" and "top customers" stats are unaffected.
 
 ---
 
@@ -328,17 +318,17 @@ la-gondola-dashboard/
 │   │   ├── layout.tsx                 # Sidebar layout
 │   │   ├── SidebarNav.tsx             # Nav links (active state via pathname)
 │   │   ├── LanguageSwitcher.tsx       # Locale cookie toggle
-│   │   ├── page.tsx                   # Main dashboard (10 queries)
+│   │   ├── page.tsx                   # Main dashboard (11 queries incl. escalation count)
 │   │   ├── reservations/
 │   │   │   ├── page.tsx               # Reservations list
-│   │   │   ├── TableSelect.tsx        # Client dropdown for table assignment
+│   │   │   ├── TableSelect.tsx        # Client dropdown; shows inline error on failed assignment
 │   │   │   └── actions.ts             # assignTable server action
 │   │   ├── floor-plan/
 │   │   │   ├── page.tsx               # Floor plan page shell
-│   │   │   ├── FloorEditor.tsx        # Edit mode (drag, add, delete)
+│   │   │   ├── FloorEditor.tsx        # Edit mode; inline error for add/drag failures
 │   │   │   ├── FloorCanvas.tsx        # Read-only canvas (used by editor)
-│   │   │   ├── BookingCanvas.tsx      # Live booking view (client, real-time)
-│   │   │   └── actions.ts             # saveTables server action
+│   │   │   ├── BookingCanvas.tsx      # Live booking view; loading state + fetch error display
+│   │   │   └── actions.ts             # addTable (derives restaurant_id server-side), deleteTable, updateTablePosition
 │   │   ├── customers/
 │   │   │   ├── page.tsx               # Customer list
 │   │   │   ├── BirthdayCell.tsx       # Inline date editor
@@ -393,12 +383,31 @@ la-gondola-dashboard/
 | AI handled % (91%) | Dashboard stat card + performance ring | Placeholder — needs n8n conversation analytics |
 | Win-back campaign | `/dashboard/campaigns` | "Coming soon" stub |
 | Seasonal campaign | `/dashboard/campaigns` | "Coming soon" stub |
-| Seed data cleanup | `reservations` table | 120 fake rows, removable via SQL above (§9) |
-| `conversations` table | Dashboard | Not surfaced in UI yet |
+| Seed data cleanup | `reservations` table | **Done 2026-06-28** — 120 rows deleted and verified (see §9) |
+| `conversations` escalation count | Dashboard stat card | **Live** — count of `stato = 'escalation'` shown as 5th stat card; `storia` JSON not parsed |
 | Pricing tiers | Admin CRM / billing | Backlog — e.g. 50/100/200 message tiers with different API/AI usage limits. Needs its own scoping session; ties into future Stripe integration and usage enforcement logic. |
 | Rebrand to TeamIQ | Product / all UIs | Backlog — product name may change from "La Gondola" (per-restaurant dashboard) to a platform brand (e.g. TeamIQ). Scope TBD, not started. No code changes until naming is finalised. |
 | Multi-tenant architecture | All new tables | Confirmed — La Gondola is the first of many clients. All new tables must be multi-tenant with a `restaurant_id` FK and appropriate RLS. The admin CRM at `/admin` is the operator panel for managing all clients. Never design for single-tenant only. |
 | Usage-based tier enforcement | Admin CRM / tiers | Backlog — tiers are assignable in the admin UI but not measured or enforced. Real enforcement needs a per-message event log fed from n8n (e.g. a new `message_events` table written by the WhatsApp workflow node). Without it, usage-vs-limit comparison is impossible. |
+
+---
+
+## 13. RLS Cross-Tenant Isolation Test
+
+**Date:** 2026-06-28  
+**Result:** PASS — zero cross-tenant data leakage confirmed
+
+**Method:**
+- Created a throwaway test restaurant (`966d3a0e-d7e0-44b2-88ee-18c747b6aac6`) owned by a new non-admin auth user (`860b8496-7bce-4f6a-ad18-006a24f40c4d`) with 1 dummy reservation and 1 dummy customer.
+- Simulated the test user's session via `BEGIN; SET LOCAL ROLE authenticated;` + `set_config('request.jwt.claims', '{"sub": "860b8496..."}', true)` — the exact mechanism PostgREST uses when the app runs under the anon key. Tested via n8n Postgres node (superuser connection, but the transaction-scoped role switch forces RLS evaluation as if it were the anon key path).
+- Queried the real restaurant (`fc1dc756-8e83-473d-9d6d-c32720e4d258`) from the test user's session:
+  - `real_reservations_visible: 0` ✅
+  - `real_customers_visible: 0` ✅
+  - `real_restaurant_visible: 0` ✅
+- Sanity-checked own-restaurant access: `own_reservations_visible: 1, own_customers_visible: 1, own_restaurant_visible: 1` ✅
+- All test data deleted afterwards (1 reservation, 1 customer, 1 restaurant, 1 auth.users row). Verified via follow-up count: all 4 remain at 0.
+
+**Note:** The real owner (`f1885f1c-28a9-4172-8710-220af0231a4e`) is also in `super_admins`, so testing as that user would have been meaningless — admin policies are OR'd with owner policies (PERMISSIVE mode). The test correctly used a non-admin user.
 
 ---
 
@@ -447,9 +456,11 @@ supabase/migrations/
 
 ---
 
-## 13. Git History (Recent)
+## 15. Git History (Recent)
 
 ```
+1bb921e  feat: reliability sweep — security fix, error states, escalation stat card
+1c01f29  docs: update HANDOFF.md — tiers session close
 dadb1cd  feat: pricing tiers for admin CRM — assignable, not yet enforced
 b62b172  docs: add HANDOFF.md to repo root
 85e0097  feat: admin CRM at /admin with billing management and usage metrics
