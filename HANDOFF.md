@@ -1,6 +1,6 @@
 # La Gondola Dashboard — Handoff Summary
 
-> Last updated: 2026-06-28  
+> Last updated: 2026-06-28 (tiers session)  
 > Author: Claude Code (Sonnet 4.6)  
 > Repo: https://github.com/rbnhbd71/la-gondola
 
@@ -450,6 +450,8 @@ supabase/migrations/
 ## 13. Git History (Recent)
 
 ```
+dadb1cd  feat: pricing tiers for admin CRM — assignable, not yet enforced
+b62b172  docs: add HANDOFF.md to repo root
 85e0097  feat: admin CRM at /admin with billing management and usage metrics
 5c3e398  feat: split stats chart into lunch/dinner grouped bars with subtotals
 adbe574  feat: performance rings bar on dashboard (fulfillment + repeat guests real data)
