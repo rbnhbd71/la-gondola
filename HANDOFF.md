@@ -1,6 +1,6 @@
 # La Gondola Dashboard — Handoff Summary
 
-> Last updated: 2026-06-28 (reliability + escalation session)  
+> Last updated: 2026-06-29 (inline booking editor session)  
 > Author: Claude Code (Sonnet 4.6)  
 > Repo: https://github.com/rbnhbd71/la-gondola
 
@@ -117,7 +117,10 @@ created_at     timestamptz
 ```
 id             uuid  PK
 restaurant_id  uuid  → restaurants(id)
-telefono       text  NOT NULL
+telefono       text  NULL              ← nullable since migration 0006; WhatsApp bot always sets it,
+                                         dashboard-created bookings have no phone number.
+                                         UNIQUE(restaurant_id, telefono) still holds — Postgres
+                                         treats NULL ≠ NULL so multiple NULLs are allowed.
 nome           text
 data           date  NOT NULL
 ora            time  NOT NULL
@@ -225,7 +228,13 @@ Server component + client `TableSelect`. Shows all reservations, allows assignin
 ### `/dashboard/floor-plan` — Floor Plan
 Two modes:
 - **Edit mode** (`FloorEditor.tsx`) — drag tables, add/delete tables, save positions via server action
-- **Booking mode** (`BookingCanvas.tsx`) — client component, fetches real-time data from Supabase. Date navigation (prev/next day arrows), lunch/dinner service toggle. Shows which tables are booked with guest name/count overlay.
+- **Booking mode** (`BookingCanvas.tsx`) — client component, fetches reservation data from Supabase. Date navigation (prev/next day arrows), lunch/dinner service toggle. Shows which tables are booked with guest name/count tooltip on single-click.
+
+**Inline booking editor** (added 2026-06-29): double-click (or double-tap) any table to open an editor panel below the canvas.
+- **Free table** → create form: Nome (optional free text), Ospiti (number, warns if > table capacity but allows), Ora (time picker), Data (date — changing it updates the canvas date and triggers a reservation reload). Submits via `createReservationAtTable`; updates local state from returned row without a full refetch.
+- **Booked table** → view mode showing name/time/guests. Two actions: **Edit** (opens pre-filled form for `nome/ospiti/ora` only — no date or table reassignment; submits via `updateReservation`) and **Cancel Booking** (sets `stato = 'cancellata'` via `cancelReservation`; transitions panel to create mode).
+- All three server actions derive `restaurant_id` server-side and scope DB writes to that restaurant. `cancelReservation` and `updateReservation` add an explicit `.eq('restaurant_id', restaurant.id)` filter on top of RLS.
+- Dashboard-created reservations have `telefono = NULL` (migration 0006 made the column nullable).
 
 ### `/dashboard/customers` — Customer CRM
 Lists all customers. Inline birthday date editing (`BirthdayCell.tsx` — client component, calls server action). Shows visit count, notes, last visit.
@@ -324,11 +333,12 @@ la-gondola-dashboard/
 │   │   │   ├── TableSelect.tsx        # Client dropdown; shows inline error on failed assignment
 │   │   │   └── actions.ts             # assignTable server action
 │   │   ├── floor-plan/
-│   │   │   ├── page.tsx               # Floor plan page shell
+│   │   │   ├── page.tsx               # Floor plan page shell; threads i18n t prop chain
 │   │   │   ├── FloorEditor.tsx        # Edit mode; inline error for add/drag failures
 │   │   │   ├── FloorCanvas.tsx        # Read-only canvas (used by editor)
-│   │   │   ├── BookingCanvas.tsx      # Live booking view; loading state + fetch error display
-│   │   │   └── actions.ts             # addTable (derives restaurant_id server-side), deleteTable, updateTablePosition
+│   │   │   ├── BookingCanvas.tsx      # Booking view; double-click editor; create/edit/cancel flow
+│   │   │   └── actions.ts             # addTable, deleteTable, updateTablePosition,
+│   │   │                              #   createReservationAtTable, cancelReservation, updateReservation
 │   │   ├── customers/
 │   │   │   ├── page.tsx               # Customer list
 │   │   │   ├── BirthdayCell.tsx       # Inline date editor
@@ -360,7 +370,8 @@ la-gondola-dashboard/
         ├── 0002_add_tables_and_table_id.sql
         ├── 0003_add_reservations_update_policy.sql
         ├── 0004_add_admin_crm.sql     # super_admins + client_billing + admin RLS
-        └── 0005_add_tiers.sql         # tiers table + client_billing.tier_id FK
+        ├── 0005_add_tiers.sql         # tiers table + client_billing.tier_id FK
+        └── 0006_nullable_telefono.sql # ALTER TABLE reservations ALTER COLUMN telefono DROP NOT NULL
 ```
 
 ---
@@ -459,6 +470,7 @@ supabase/migrations/
 ## 15. Git History (Recent)
 
 ```
+7c5af37  feat: inline booking editor on floor plan canvas
 1bb921e  feat: reliability sweep — security fix, error states, escalation stat card
 1c01f29  docs: update HANDOFF.md — tiers session close
 dadb1cd  feat: pricing tiers for admin CRM — assignable, not yet enforced
