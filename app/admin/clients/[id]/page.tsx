@@ -1,7 +1,7 @@
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import BillingForm from './BillingForm'
+import BillingForm, { type Tier } from './BillingForm'
 import UsageChart from './UsageChart'
 import type { BillingData } from './actions'
 
@@ -46,6 +46,7 @@ export default async function ClientDetailPage({
     { data: reservations },
     { data: conversations },
     { data: customers },
+    { data: tiersRaw },
   ] = await Promise.all([
     supabase
       .from('restaurants')
@@ -54,7 +55,7 @@ export default async function ClientDetailPage({
       .single(),
     supabase
       .from('client_billing')
-      .select('billing_status, billing_notes, monthly_rate, client_since')
+      .select('billing_status, billing_notes, monthly_rate, client_since, tier_id')
       .eq('restaurant_id', id)
       .maybeSingle(),
     supabase
@@ -70,6 +71,10 @@ export default async function ClientDetailPage({
       .from('customers')
       .select('ultimo_messaggio_compleanno')
       .eq('restaurant_id', id),
+    supabase
+      .from('tiers')
+      .select('id, name, monthly_message_limit, monthly_price')
+      .order('monthly_price'),
   ])
 
   if (!restaurant) notFound()
@@ -119,8 +124,16 @@ export default async function ClientDetailPage({
         billing_notes: billingRaw.billing_notes as string | null,
         monthly_rate: billingRaw.monthly_rate != null ? Number(billingRaw.monthly_rate) : null,
         client_since: billingRaw.client_since as string | null,
+        tier_id: billingRaw.tier_id as string | null,
       }
     : null
+
+  const tiers: Tier[] = (tiersRaw ?? []).map(t => ({
+    id: t.id as string,
+    name: t.name as string,
+    monthly_message_limit: t.monthly_message_limit as number,
+    monthly_price: Number(t.monthly_price),
+  }))
 
   return (
     <div className="p-10 max-w-4xl">
@@ -137,7 +150,7 @@ export default async function ClientDetailPage({
       <section className="mb-10">
         <h2 className="font-display font-medium text-lg text-ink mb-4">Billing</h2>
         <div className="bg-surface rounded-xl border border-line p-6">
-          <BillingForm billing={billing} restaurantId={id} />
+          <BillingForm billing={billing} restaurantId={id} tiers={tiers} />
         </div>
       </section>
 

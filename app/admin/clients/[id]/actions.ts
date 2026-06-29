@@ -9,6 +9,7 @@ export interface BillingData {
   billing_notes: string | null
   monthly_rate: number | null
   client_since: string | null
+  tier_id: string | null
 }
 
 export async function updateBilling(
@@ -35,6 +36,7 @@ export async function updateBilling(
         billing_notes: data.billing_notes || null,
         monthly_rate: data.monthly_rate,
         client_since: data.client_since || null,
+        tier_id: data.tier_id || null,
         updated_at: new Date().toISOString(),
       },
       { onConflict: 'restaurant_id' },

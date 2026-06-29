@@ -151,6 +151,28 @@ updated_at     timestamptz
 ```
 > Dashboard currently does not display conversations — managed entirely by n8n.
 
+### `tiers` (admin-only)
+```
+id                    uuid         PK
+name                  text         NOT NULL              ← e.g. 'Starter', 'Growth', 'Pro'
+monthly_message_limit int          NOT NULL              ← WhatsApp messages per month cap
+monthly_price         numeric(8,2) NOT NULL              ← monthly price in EUR
+created_at            timestamptz
+```
+Seeded rows: Starter (200 msg/mo, €49), Growth (600 msg/mo, €99), Pro (2000 msg/mo, €199).
+RLS: super_admins only — no owner-facing policy. Restaurant owners cannot read this table.
+
+### `client_billing` additions (migration 0005)
+```
+tier_id  uuid  NULL → tiers(id) ON DELETE SET NULL
+```
+Nullable FK — a client may not have a tier assigned. Deleting a tier sets this column to NULL
+on all affected clients rather than cascading.
+
+**Tier assignment state (important):** Tiers are currently assignable via the admin UI but
+not enforced or measured. Real usage tracking requires a per-message event log fed from the
+n8n WhatsApp workflow — that log does not exist yet. See §12 backlog.
+
 ### Row-Level Security
 
 RLS is enabled on all tables. The Next.js app uses the **anon key** and is subject to RLS. n8n connects as the **postgres superuser** and bypasses RLS.
@@ -347,7 +369,8 @@ la-gondola-dashboard/
         ├── 0001_add_ultimo_messaggio_compleanno.sql
         ├── 0002_add_tables_and_table_id.sql
         ├── 0003_add_reservations_update_policy.sql
-        └── 0004_add_admin_crm.sql     # super_admins + client_billing + admin RLS
+        ├── 0004_add_admin_crm.sql     # super_admins + client_billing + admin RLS
+        └── 0005_add_tiers.sql         # tiers table + client_billing.tier_id FK
 ```
 
 ---
@@ -375,6 +398,7 @@ la-gondola-dashboard/
 | Pricing tiers | Admin CRM / billing | Backlog — e.g. 50/100/200 message tiers with different API/AI usage limits. Needs its own scoping session; ties into future Stripe integration and usage enforcement logic. |
 | Rebrand to TeamIQ | Product / all UIs | Backlog — product name may change from "La Gondola" (per-restaurant dashboard) to a platform brand (e.g. TeamIQ). Scope TBD, not started. No code changes until naming is finalised. |
 | Multi-tenant architecture | All new tables | Confirmed — La Gondola is the first of many clients. All new tables must be multi-tenant with a `restaurant_id` FK and appropriate RLS. The admin CRM at `/admin` is the operator panel for managing all clients. Never design for single-tenant only. |
+| Usage-based tier enforcement | Admin CRM / tiers | Backlog — tiers are assignable in the admin UI but not measured or enforced. Real enforcement needs a per-message event log fed from n8n (e.g. a new `message_events` table written by the WhatsApp workflow node). Without it, usage-vs-limit comparison is impossible. |
 
 ---
 
@@ -415,6 +439,7 @@ app/admin/
       actions.ts                  # updateBilling server action
 supabase/migrations/
   0004_add_admin_crm.sql          # super_admins + client_billing + admin RLS policies
+  0005_add_tiers.sql              # tiers table + client_billing.tier_id FK + 3 seed rows
 ```
 
 **Migration applied:** via n8n temp-workflow method on 2026-06-28.

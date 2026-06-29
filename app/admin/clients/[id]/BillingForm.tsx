@@ -4,6 +4,13 @@ import { useState, useTransition } from 'react'
 import { updateBilling } from './actions'
 import type { BillingData } from './actions'
 
+export type Tier = {
+  id: string
+  name: string
+  monthly_message_limit: number
+  monthly_price: number
+}
+
 type BillingStatus = 'trial' | 'active' | 'paused' | 'cancelled'
 
 const statusStyles: Record<BillingStatus, { bg: string; color: string }> = {
@@ -20,15 +27,18 @@ const labelCls = 'block text-xs font-normal text-ink-faint uppercase tracking-wi
 export default function BillingForm({
   billing,
   restaurantId,
+  tiers,
 }: {
   billing: BillingData | null
   restaurantId: string
+  tiers: Tier[]
 }) {
   const initial: BillingData = {
     billing_status: billing?.billing_status ?? 'trial',
     billing_notes: billing?.billing_notes ?? null,
     monthly_rate: billing?.monthly_rate != null ? Number(billing.monthly_rate) : null,
     client_since: billing?.client_since ?? null,
+    tier_id: billing?.tier_id ?? null,
   }
 
   const [editing, setEditing] = useState(false)
@@ -138,6 +148,37 @@ export default function BillingForm({
               {committed.monthly_rate != null ? `€${Number(committed.monthly_rate).toFixed(2)}` : '—'}
             </p>
           )}
+        </div>
+
+        {/* Tier */}
+        <div className="col-span-2">
+          <label className={labelCls}>Tier</label>
+          {editing ? (
+            <select
+              value={fields.tier_id ?? ''}
+              onChange={e => set('tier_id', e.target.value || null)}
+              className={inputCls}
+            >
+              <option value="">No tier assigned</option>
+              {tiers.map(t => (
+                <option key={t.id} value={t.id}>
+                  {t.name} — {t.monthly_message_limit.toLocaleString()} msg/mo · €{t.monthly_price.toFixed(2)}/mo
+                </option>
+              ))}
+            </select>
+          ) : (() => {
+            const tier = tiers.find(t => t.id === committed.tier_id)
+            return tier ? (
+              <div>
+                <p className={readOnlyCls}>{tier.name}</p>
+                <p className="text-xs text-ink-faint">
+                  {tier.monthly_message_limit.toLocaleString()} msg/mo · €{tier.monthly_price.toFixed(2)}/mo
+                </p>
+              </div>
+            ) : (
+              <p className={readOnlyCls}>—</p>
+            )
+          })()}
         </div>
 
         {/* Client since */}
