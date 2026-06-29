@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getLocale } from '@/lib/i18n/getLocale'
 import { dictionary } from '@/lib/i18n/dictionary'
-import { CalendarDays, UserPlus, Users, MessageCircle } from 'lucide-react'
+import { AlertCircle, CalendarDays, UserPlus, Users, MessageCircle } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 function formatTime(timeStr: string) {
@@ -151,6 +151,7 @@ export default async function DashboardPage() {
     { data: resThisMonth },
     { count: repeatCustomersCount },
     { count: totalCustomersCount },
+    { count: escalationCount },
   ] = await Promise.all([
     supabase
       .from('reservations')
@@ -203,6 +204,11 @@ export default async function DashboardPage() {
       .from('customers')
       .select('*', { count: 'exact', head: true })
       .eq('restaurant_id', restaurant.id),
+    supabase
+      .from('conversations')
+      .select('*', { count: 'exact', head: true })
+      .eq('restaurant_id', restaurant.id)
+      .eq('stato', 'escalation'),
   ])
 
   const tableLabel = new Map((tables ?? []).map(t => [t.id, t.label]))
@@ -233,7 +239,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* ── Stat cards ───────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
         <StatCard
           icon={CalendarDays}
           iconBg="bg-clay-tint"
@@ -263,6 +269,13 @@ export default async function DashboardPage() {
           label={dict.dashboard.statAiHandled}
           value="91%"
           note={dict.dashboard.estimateNote}
+        />
+        <StatCard
+          icon={AlertCircle}
+          iconBg="bg-red-50"
+          iconColor="text-red-600"
+          label={dict.dashboard.statEscalations}
+          value={escalationCount ?? 0}
         />
       </div>
 

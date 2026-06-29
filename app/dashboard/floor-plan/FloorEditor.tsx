@@ -29,11 +29,17 @@ export default function FloorEditor({
   const [viewMode, setViewMode] = useState<'booking' | 'layout'>('booking')
   const [layoutEditing, setLayoutEditing] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const [editError, setEditError] = useState<string | null>(null)
 
   function handleAdd() {
     startTransition(async () => {
-      const result = await addTable(restaurantId)
-      if (result.data) setTables(prev => [...prev, result.data!])
+      const result = await addTable()
+      if (result.data) {
+        setTables(prev => [...prev, result.data!])
+        setEditError(null)
+      } else if (result.error) {
+        setEditError(result.error)
+      }
     })
   }
 
@@ -50,7 +56,10 @@ export default function FloorEditor({
     const newX = Math.max(0, table.x + delta.x)
     const newY = Math.max(0, table.y + delta.y)
     setTables(prev => prev.map(t => t.id === id ? { ...t, x: newX, y: newY } : t))
-    startTransition(async () => { await updateTablePosition(id, newX, newY) })
+    startTransition(async () => {
+      const result = await updateTablePosition(id, newX, newY)
+      if (result.error) setEditError(result.error)
+    })
   }
 
   return (
@@ -86,7 +95,7 @@ export default function FloorEditor({
         <div>
           <div className="flex items-center gap-3 mb-4">
             <button
-              onClick={() => setLayoutEditing(e => !e)}
+              onClick={() => { setLayoutEditing(e => !e); setEditError(null) }}
               className={`text-sm px-4 py-2 rounded-md border transition-colors ${
                 layoutEditing
                   ? 'bg-clay text-white border-clay hover:bg-clay-dark'
@@ -105,6 +114,9 @@ export default function FloorEditor({
               </button>
             )}
           </div>
+          {editError && (
+            <p className="text-sm text-red-600 mb-2">{editError}</p>
+          )}
           <FloorCanvas
             tables={tables}
             editMode={layoutEditing}

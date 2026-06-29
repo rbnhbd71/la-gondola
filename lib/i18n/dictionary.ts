@@ -46,6 +46,7 @@ export type Dictionary = {
     perfFulfillment: string
     perfRepeatCustomers: string
     perfAiHandled: string
+    statEscalations: string
   }
   reservations: {
     heading: string
@@ -177,6 +178,7 @@ const en: Dictionary = {
     perfFulfillment: 'Fulfillment',
     perfRepeatCustomers: 'Repeat guests',
     perfAiHandled: 'AI handled',
+    statEscalations: 'Open escalations',
   },
   reservations: {
     heading: 'Reservations',
@@ -306,6 +308,7 @@ const it: Dictionary = {
     perfFulfillment: 'Conferme',
     perfRepeatCustomers: 'Abituali',
     perfAiHandled: 'Gestiti AI',
+    statEscalations: 'Escalazioni aperte',
   },
   reservations: {
     heading: 'Prenotazioni',
@@ -435,6 +438,7 @@ const fr: Dictionary = {
     perfFulfillment: 'Confirmations',
     perfRepeatCustomers: 'Fidèles',
     perfAiHandled: 'Géré par IA',
+    statEscalations: 'Escalades ouvertes',
   },
   reservations: {
     heading: 'Réservations',
@@ -564,6 +568,7 @@ const es: Dictionary = {
     perfFulfillment: 'Confirmaciones',
     perfRepeatCustomers: 'Habituales',
     perfAiHandled: 'Gestionado IA',
+    statEscalations: 'Escalaciones abiertas',
   },
   reservations: {
     heading: 'Reservas',

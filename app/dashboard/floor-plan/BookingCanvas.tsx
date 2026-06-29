@@ -32,6 +32,8 @@ export default function BookingCanvas({
   const [service, setService] = useState<'lunch' | 'dinner'>(defaultService)
   const [reservations, setReservations] = useState<Reservation[]>([])
   const [activeTableId, setActiveTableId] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [fetchError, setFetchError] = useState<string | null>(null)
 
   useEffect(() => {
     const supabase = createBrowserClient(
@@ -39,6 +41,8 @@ export default function BookingCanvas({
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     )
     async function load() {
+      setLoading(true)
+      setFetchError(null)
       let query = supabase
         .from('reservations')
         .select('id, nome, ospiti, ora, table_id')
@@ -48,9 +52,14 @@ export default function BookingCanvas({
         .not('table_id', 'is', null)
       if (service === 'lunch') query = query.lt('ora', '16:00:00')
       else query = query.gte('ora', '16:00:00')
-      const { data } = await query
-      setReservations((data ?? []) as Reservation[])
-      setActiveTableId(null)
+      const { data, error } = await query
+      if (error) {
+        setFetchError(error.message)
+      } else {
+        setReservations((data ?? []) as Reservation[])
+        setActiveTableId(null)
+      }
+      setLoading(false)
     }
     load()
   }, [date, service, restaurantId])
@@ -110,8 +119,12 @@ export default function BookingCanvas({
         </div>
       </div>
 
+      {fetchError && (
+        <p className="text-sm text-red-600 mb-3">{fetchError}</p>
+      )}
+
       <div
-        className="relative bg-surface-sunk rounded-xl overflow-auto"
+        className={`relative bg-surface-sunk rounded-xl overflow-auto transition-opacity ${loading ? 'opacity-50 pointer-events-none' : ''}`}
         style={{ height: 520 }}
         onClick={() => setActiveTableId(null)}
       >

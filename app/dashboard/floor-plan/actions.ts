@@ -3,15 +3,23 @@ import { createClient } from '@/lib/supabase/server'
 
 type TableRow = { id: string; label: string; capacity: number; x: number; y: number }
 
-export async function addTable(restaurantId: string): Promise<{ data?: TableRow; error?: string }> {
+export async function addTable(): Promise<{ data?: TableRow; error?: string }> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized' }
 
+  const { data: restaurant } = await supabase
+    .from('restaurants')
+    .select('id')
+    .eq('owner_id', user.id)
+    .single()
+
+  if (!restaurant) return { error: 'No restaurant found.' }
+
   const { data: existing } = await supabase
     .from('tables')
     .select('label, x, y')
-    .eq('restaurant_id', restaurantId)
+    .eq('restaurant_id', restaurant.id)
 
   const rows = existing ?? []
 
@@ -28,7 +36,7 @@ export async function addTable(restaurantId: string): Promise<{ data?: TableRow;
 
   const { data, error } = await supabase
     .from('tables')
-    .insert({ restaurant_id: restaurantId, label, capacity: 4, x, y })
+    .insert({ restaurant_id: restaurant.id, label, capacity: 4, x, y })
     .select('id, label, capacity, x, y')
     .single()
 
