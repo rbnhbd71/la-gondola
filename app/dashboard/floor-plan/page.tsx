@@ -62,6 +62,11 @@ export default async function FloorPlanPage() {
           lunch: dict.floorPlan.lunch,
           dinner: dict.floorPlan.dinner,
           guests: dict.floorPlan.guests,
+          save: dict.common.save,
+          cancel: dict.common.cancel,
+          cancelBooking: dict.floorPlan.cancelBooking,
+          capacityWarning: dict.floorPlan.capacityWarning,
+          createBooking: dict.floorPlan.createBooking,
         }}
       />
     </div>

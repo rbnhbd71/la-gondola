@@ -23,6 +23,11 @@ export default function FloorEditor({
     lunch: string
     dinner: string
     guests: string
+    save: string
+    cancel: string
+    cancelBooking: string
+    capacityWarning: string
+    createBooking: string
   }
 }) {
   const [tables, setTables] = useState<Table[]>(initialTables)
@@ -87,7 +92,18 @@ export default function FloorEditor({
         <BookingCanvas
           tables={tables}
           restaurantId={restaurantId}
-          t={{ lunch: t.lunch, dinner: t.dinner, guests: t.guests, noTablesFound: t.noTablesFound }}
+          t={{
+            lunch: t.lunch,
+            dinner: t.dinner,
+            guests: t.guests,
+            noTablesFound: t.noTablesFound,
+            edit: t.edit,
+            save: t.save,
+            cancel: t.cancel,
+            cancelBooking: t.cancelBooking,
+            capacityWarning: t.capacityWarning,
+            createBooking: t.createBooking,
+          }}
         />
       )}
 

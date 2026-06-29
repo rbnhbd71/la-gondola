@@ -63,3 +63,97 @@ export async function updateTablePosition(tableId: string, x: number, y: number)
   if (error) return { error: error.message }
   return {}
 }
+
+type ReservationRow = { id: string; nome: string | null; ospiti: number; ora: string; table_id: string }
+
+export async function createReservationAtTable(args: {
+  tableId: string
+  nome: string | null
+  ospiti: number
+  data: string
+  ora: string
+}): Promise<{ data?: ReservationRow; error?: string }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Unauthorized' }
+
+  const { data: restaurant } = await supabase
+    .from('restaurants')
+    .select('id')
+    .eq('owner_id', user.id)
+    .single()
+  if (!restaurant) return { error: 'No restaurant found.' }
+
+  const { data: table } = await supabase
+    .from('tables')
+    .select('id')
+    .eq('id', args.tableId)
+    .eq('restaurant_id', restaurant.id)
+    .single()
+  if (!table) return { error: 'Table not found.' }
+
+  const { data, error } = await supabase
+    .from('reservations')
+    .insert({
+      restaurant_id: restaurant.id,
+      table_id: args.tableId,
+      nome: args.nome,
+      ospiti: args.ospiti,
+      data: args.data,
+      ora: args.ora,
+      stato: 'attiva',
+      telefono: null,
+    })
+    .select('id, nome, ospiti, ora, table_id')
+    .single()
+
+  if (error) return { error: error.message }
+  return { data }
+}
+
+export async function cancelReservation(reservationId: string): Promise<{ error?: string }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Unauthorized' }
+
+  const { data: restaurant } = await supabase
+    .from('restaurants')
+    .select('id')
+    .eq('owner_id', user.id)
+    .single()
+  if (!restaurant) return { error: 'No restaurant found.' }
+
+  const { error } = await supabase
+    .from('reservations')
+    .update({ stato: 'cancellata' })
+    .eq('id', reservationId)
+    .eq('restaurant_id', restaurant.id)
+
+  if (error) return { error: error.message }
+  return {}
+}
+
+export async function updateReservation(
+  reservationId: string,
+  updates: { nome: string | null; ospiti: number; ora: string }
+): Promise<{ error?: string }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Unauthorized' }
+
+  const { data: restaurant } = await supabase
+    .from('restaurants')
+    .select('id')
+    .eq('owner_id', user.id)
+    .single()
+  if (!restaurant) return { error: 'No restaurant found.' }
+
+  const { error } = await supabase
+    .from('reservations')
+    .update({ nome: updates.nome, ospiti: updates.ospiti, ora: updates.ora })
+    .eq('id', reservationId)
+    .eq('restaurant_id', restaurant.id)
+
+  if (error) return { error: error.message }
+  return {}
+}

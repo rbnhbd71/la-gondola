@@ -84,6 +84,9 @@ export type Dictionary = {
     lunch: string
     dinner: string
     guests: string
+    cancelBooking: string
+    capacityWarning: string
+    createBooking: string
   }
   campaigns: {
     heading: string
@@ -213,6 +216,9 @@ const en: Dictionary = {
     lunch: 'Lunch',
     dinner: 'Dinner',
     guests: 'guests',
+    cancelBooking: 'Cancel Booking',
+    capacityWarning: 'Exceeds table capacity',
+    createBooking: 'Create Reservation',
   },
   campaigns: {
     heading: 'Campaigns',
@@ -343,6 +349,9 @@ const it: Dictionary = {
     lunch: 'Pranzo',
     dinner: 'Cena',
     guests: 'ospiti',
+    cancelBooking: 'Annulla prenotazione',
+    capacityWarning: 'Supera la capacità del tavolo',
+    createBooking: 'Crea prenotazione',
   },
   campaigns: {
     heading: 'Campagne',
@@ -473,6 +482,9 @@ const fr: Dictionary = {
     lunch: 'Déjeuner',
     dinner: 'Dîner',
     guests: 'couverts',
+    cancelBooking: 'Annuler la réservation',
+    capacityWarning: 'Dépasse la capacité de la table',
+    createBooking: 'Créer une réservation',
   },
   campaigns: {
     heading: 'Campagnes',
@@ -603,6 +615,9 @@ const es: Dictionary = {
     lunch: 'Almuerzo',
     dinner: 'Cena',
     guests: 'comensales',
+    cancelBooking: 'Cancelar reserva',
+    capacityWarning: 'Supera la capacidad de la mesa',
+    createBooking: 'Crear reserva',
   },
   campaigns: {
     heading: 'Campañas',
